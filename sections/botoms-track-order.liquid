@@ -1,0 +1,109 @@
+<div
+  class="botoms-track"
+  style="--track-padding-top: {{ section.settings.padding-block-start }}px; --track-padding-bottom: {{ section.settings.padding-block-end }}px;"
+>
+  <div class="botoms-track__inner">
+    <div class="botoms-track__card">
+      <h2 class="botoms-track__title">{{ 'botoms.pages.track_account' | t }}</h2>
+      <p class="botoms-track__text">{{ 'botoms.pages.track_account_text' | t }}</p>
+      <a class="button botoms-track__button" href="{{ routes.account_url }}">{{ 'botoms.pages.track_account_button' | t }}</a>
+    </div>
+    <div class="botoms-track__card">
+      <h2 class="botoms-track__title">{{ 'botoms.pages.track_email' | t }}</h2>
+      <p class="botoms-track__text">{{ 'botoms.pages.track_email_text' | t }}</p>
+    </div>
+    {%- if section.settings.extra != blank -%}
+      <div class="botoms-track__card botoms-track__card--wide">{{ section.settings.extra }}</div>
+    {%- endif -%}
+  </div>
+</div>
+
+{% stylesheet %}
+  .botoms-track {
+    padding: var(--track-padding-top) 16px var(--track-padding-bottom);
+    color: var(--botoms-ink);
+  }
+
+  .botoms-track__inner {
+    display: grid;
+    gap: 16px;
+    max-width: 760px;
+    margin-inline: auto;
+  }
+
+  .botoms-track__card {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 20px;
+    border: 1px solid var(--botoms-line);
+    border-radius: 12px;
+    background-color: var(--botoms-white);
+  }
+
+  .botoms-track__title {
+    margin: 0;
+    font-family: var(--font-heading--family);
+    font-weight: var(--font-heading--weight);
+    font-size: 1.25rem;
+  }
+
+  .botoms-track__text {
+    margin: 0;
+    font-size: 0.9375rem;
+    line-height: 1.55;
+    color: var(--botoms-muted-ink);
+  }
+
+  .botoms-track__button {
+    margin-top: 4px;
+  }
+
+  @media screen and (min-width: 750px) {
+    .botoms-track__inner {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .botoms-track__card--wide {
+      grid-column: 1 / -1;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Botoms track order",
+  "tag": "section",
+  "class": "section-botoms-track-order",
+  "settings": [
+    {
+      "type": "richtext",
+      "id": "extra",
+      "label": "Extra information",
+      "info": "Optional, e.g. a courier tracking link once Shiprocket is connected."
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "Top padding",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "Bottom padding",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 48
+    }
+  ],
+  "presets": [{ "name": "Botoms track order" }]
+}
+{% endschema %}

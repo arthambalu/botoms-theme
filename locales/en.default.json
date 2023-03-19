@@ -26,6 +26,15 @@
     "fabric_story": {
       "shop": "Shop {{ fabric }}"
     },
+    "pages": {
+      "size_chart": "Size chart",
+      "lengths": "Lengths",
+      "track_account": "Track with your account",
+      "track_account_text": "Sign in to see every order and its delivery status.",
+      "track_account_button": "Go to my orders",
+      "track_email": "Track from your email",
+      "track_email_text": "When your order ships, we email you a tracking link. Open it any time to see where your parcel is."
+    },
     "cart": {
       "free_delivery_remaining": "Add {{ amount }} more for free delivery",
       "free_delivery_unlocked": "You've unlocked free delivery",

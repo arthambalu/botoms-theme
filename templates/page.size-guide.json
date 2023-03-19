@@ -1,0 +1,106 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main": {
+      "type": "main-page",
+      "blocks": {
+        "heading": {
+          "type": "text",
+          "name": "t:names.title",
+          "settings": {
+            "text": "<h1>{{ closest.page.title }}</h1>",
+            "width": "100%",
+            "max_width": "normal",
+            "alignment": "left",
+            "type_preset": "h1",
+            "font": "var(--font-heading--family)",
+            "font_size": "",
+            "line_height": "normal",
+            "letter_spacing": "normal",
+            "case": "none",
+            "wrap": "pretty",
+            "background": false,
+            "background_color": "#00000026",
+            "corner_radius": 0,
+            "padding-block-start": 0,
+            "padding-block-end": 0,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0
+          },
+          "blocks": {}
+        },
+        "page-content": {
+          "type": "page-content",
+          "settings": {},
+          "blocks": {}
+        }
+      },
+      "block_order": [
+        "heading",
+        "page-content"
+      ],
+      "settings": {
+        "content_direction": "column",
+        "gap": 32,
+        "padding-block-start": 40,
+        "padding-block-end": 80
+      }
+    },
+    "size_guide": {
+      "type": "botoms-size-guide",
+      "blocks": {
+        "length_ankle": {
+          "type": "length",
+          "settings": {
+            "name": "Ankle",
+            "description": "Ends at or just above the ankle bone. Neat under short kurtis and with sneakers."
+          }
+        },
+        "length_full": {
+          "type": "length",
+          "settings": {
+            "name": "Full",
+            "description": "Extra length that gathers softly at the ankle. The classic pair for long kurtis."
+          }
+        },
+        "length_capri": {
+          "type": "length",
+          "settings": {
+            "name": "Capri",
+            "description": "Ends at mid-calf, about three-quarter length. Light and cool for warm days and workouts."
+          }
+        },
+        "length_churidar": {
+          "type": "length",
+          "settings": {
+            "name": "Churidar",
+            "description": "Extra-long and fitted, made to sit in soft folds at the ankle under kurtas."
+          }
+        }
+      },
+      "block_order": [
+        "length_ankle",
+        "length_full",
+        "length_capri",
+        "length_churidar"
+      ],
+      "settings": {
+        "lengths_heading": "Lengths",
+        "padding-block-start": 16,
+        "padding-block-end": 48
+      }
+    }
+  },
+  "order": [
+    "main",
+    "size_guide"
+  ]
+}

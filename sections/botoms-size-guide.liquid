@@ -1,0 +1,200 @@
+{%- liquid
+  assign charts = shop.metaobjects.size_chart.values
+-%}
+
+<div
+  class="botoms-size-guide"
+  style="--guide-padding-top: {{ section.settings.padding-block-start }}px; --guide-padding-bottom: {{ section.settings.padding-block-end }}px;"
+>
+  <div class="botoms-size-guide__inner">
+    {%- for chart in charts limit: 6 -%}
+      {%- assign rows = chart.measurements.value -%}
+      {%- assign unit = chart.unit.value | default: 'cm' -%}
+      <section class="botoms-size-guide__chart" aria-labelledby="SizeGuide-{{ section.id }}-{{ forloop.index }}">
+        <h2 class="botoms-size-guide__heading" id="SizeGuide-{{ section.id }}-{{ forloop.index }}">{{ chart.name.value }}</h2>
+        <p class="botoms-size-guide__unit">{{ 'botoms.product.measurements_in' | t: unit: unit }}</p>
+        <div class="botoms-size-guide__table-wrap">
+          <table class="botoms-size-guide__table">
+            <thead>
+              <tr>
+                <th scope="col">{{ 'botoms.product.size' | t }}</th>
+                <th scope="col">{{ 'botoms.product.waist' | t }}</th>
+                <th scope="col">{{ 'botoms.product.hip' | t }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {%- for row in rows -%}
+                <tr>
+                  <th scope="row">{{ row.size }}</th>
+                  <td>{{ row.waist[0] }}–{{ row.waist[1] }}</td>
+                  <td>{{ row.hip[0] }}–{{ row.hip[1] }}</td>
+                </tr>
+              {%- endfor -%}
+            </tbody>
+          </table>
+        </div>
+        {%- if chart.how_to_measure != blank -%}
+          <div class="botoms-size-guide__measure">{{ chart.how_to_measure | metafield_tag }}</div>
+        {%- endif -%}
+      </section>
+    {%- endfor -%}
+
+    {%- if section.blocks.size > 0 -%}
+      <section class="botoms-size-guide__lengths" aria-labelledby="SizeGuideLengths-{{ section.id }}">
+        <h2 class="botoms-size-guide__heading" id="SizeGuideLengths-{{ section.id }}">{{ section.settings.lengths_heading }}</h2>
+        <dl class="botoms-size-guide__length-list">
+          {%- for block in section.blocks -%}
+            <div class="botoms-size-guide__length" {{ block.shopify_attributes }}>
+              <dt>{{ block.settings.name }}</dt>
+              <dd>{{ block.settings.description }}</dd>
+            </div>
+          {%- endfor -%}
+        </dl>
+      </section>
+    {%- endif -%}
+  </div>
+</div>
+
+{% stylesheet %}
+  .botoms-size-guide {
+    padding: var(--guide-padding-top) 16px var(--guide-padding-bottom);
+    color: var(--botoms-ink);
+  }
+
+  .botoms-size-guide__inner {
+    display: grid;
+    gap: 32px;
+    max-width: 760px;
+    margin-inline: auto;
+  }
+
+  .botoms-size-guide__heading {
+    margin: 0 0 6px;
+    font-family: var(--font-heading--family);
+    font-weight: var(--font-heading--weight);
+    font-size: clamp(1.375rem, 1.2rem + 0.8vw, 1.75rem);
+  }
+
+  .botoms-size-guide__unit {
+    margin: 0 0 12px;
+    font-size: 0.875rem;
+    color: var(--botoms-muted-ink);
+  }
+
+  .botoms-size-guide__table-wrap {
+    overflow-x: auto;
+  }
+
+  .botoms-size-guide__table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9375rem;
+    text-align: left;
+  }
+
+  .botoms-size-guide__table th,
+  .botoms-size-guide__table td {
+    padding: 12px 10px;
+    border-bottom: 1px solid var(--botoms-line);
+  }
+
+  .botoms-size-guide__table thead th {
+    font-weight: 500;
+    color: var(--botoms-muted-ink);
+  }
+
+  .botoms-size-guide__measure {
+    margin-top: 16px;
+    padding: 16px;
+    border-radius: 12px;
+    background-color: var(--botoms-butterfly);
+    font-size: 0.9375rem;
+    line-height: 1.55;
+  }
+
+  .botoms-size-guide__measure p {
+    margin: 0;
+  }
+
+  .botoms-size-guide__length-list {
+    display: grid;
+    gap: 12px;
+    margin: 12px 0 0;
+  }
+
+  .botoms-size-guide__length {
+    display: grid;
+    gap: 4px;
+    padding: 14px 16px;
+    border: 1px solid var(--botoms-line);
+    border-radius: 12px;
+    background-color: var(--botoms-white);
+  }
+
+  .botoms-size-guide__length dt {
+    font-weight: 500;
+  }
+
+  .botoms-size-guide__length dd {
+    margin: 0;
+    font-size: 0.9375rem;
+    color: var(--botoms-muted-ink);
+  }
+
+  @media screen and (min-width: 750px) {
+    .botoms-size-guide__length-list {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Botoms size guide",
+  "tag": "section",
+  "class": "section-botoms-size-guide",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Shows every Size chart entry (Content > Metaobjects > Size chart), plus the lengths below."
+    },
+    {
+      "type": "text",
+      "id": "lengths_heading",
+      "label": "Lengths heading",
+      "default": "Lengths"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "Top padding",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "Bottom padding",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 48
+    }
+  ],
+  "blocks": [
+    {
+      "type": "length",
+      "name": "Length",
+      "settings": [
+        { "type": "text", "id": "name", "label": "Name", "default": "Ankle" },
+        { "type": "text", "id": "description", "label": "Description", "default": "Ends at the ankle bone." }
+      ]
+    }
+  ],
+  "presets": [{ "name": "Botoms size guide" }]
+}
+{% endschema %}
