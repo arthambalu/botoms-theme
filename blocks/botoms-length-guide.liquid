@@ -1,0 +1,244 @@
+{%- liquid
+  assign guide_product = closest.product
+  assign garment_inseam = guide_product.metafields.custom.inseam_cm.value
+  assign garment_length = guide_product.metafields.custom.length.value
+  assign style_group = guide_product.metafields.custom.style_group.value
+-%}
+
+{%- if garment_inseam != blank -%}
+  <botoms-length-guide
+    class="botoms-length"
+    data-inseam="{{ garment_inseam }}"
+    data-above="{{ 'botoms.product.length_ends_above' | t: cm: '[cm]' | escape }}"
+    data-at="{{ 'botoms.product.length_ends_at' | t | escape }}"
+    data-gathers="{{ 'botoms.product.length_gathers' | t: cm: '[cm]' | escape }}"
+    {{ block.shopify_attributes }}
+  >
+    <div class="botoms-length__head">
+      <p class="botoms-length__heading">{{ 'botoms.product.length_guide' | t }}</p>
+      {%- if garment_length != blank -%}
+        <p class="botoms-length__this">{{ 'botoms.product.length_this' | t: length: garment_length }}</p>
+      {%- endif -%}
+    </div>
+
+    <div class="botoms-length__body">
+      <svg class="botoms-length__figure" viewBox="0 0 80 160" aria-hidden="true" focusable="false">
+        <path class="botoms-length__legs" d="M24 8h32l4 42-5 100h-11l-3-86-3 86H27l-5-100z"/>
+        <line class="botoms-length__floor" x1="6" y1="150" x2="74" y2="150"/>
+        <line class="botoms-length__ankle" x1="10" y1="140" x2="70" y2="140"/>
+        <line class="botoms-length__hem" data-hem x1="12" y1="140" x2="68" y2="140"/>
+      </svg>
+
+      <div class="botoms-length__controls">
+        <label class="botoms-length__label" for="LengthHeight-{{ block.id }}">{{ 'botoms.product.your_height' | t }}</label>
+        <select class="botoms-length__select" id="LengthHeight-{{ block.id }}" data-height>
+          {%- for inches in (58..70) -%}
+            {%- assign feet = inches | divided_by: 12 -%}
+            {%- assign rest = inches | modulo: 12 -%}
+            {%- assign cm = inches | times: 2.54 | round -%}
+            <option value="{{ cm }}"{% if inches == 62 %} selected{% endif %}>{{ feet }}′{{ rest }}″ ({{ cm }} cm)</option>
+          {%- endfor -%}
+        </select>
+        <p class="botoms-length__result" data-result aria-live="polite"></p>
+        <p class="botoms-length__note">{{ 'botoms.product.length_estimate' | t }}</p>
+
+        {%- if style_group != blank -%}
+          <ul class="botoms-length__others">
+            {%- for sibling in style_group.products limit: 6 -%}
+              {%- if sibling.id != guide_product.id -%}
+                {%- assign sibling_length = sibling.metafields.custom.length.value | default: sibling.title -%}
+                <li>
+                  <a href="{{ sibling.url }}">{{ 'botoms.product.length_other' | t: length: sibling_length }}</a>
+                </li>
+              {%- endif -%}
+            {%- endfor -%}
+          </ul>
+        {%- endif -%}
+      </div>
+    </div>
+  </botoms-length-guide>
+{%- endif -%}
+
+{% stylesheet %}
+  .botoms-length {
+    display: block;
+    width: 100%;
+    padding: 16px;
+    border: 1px solid var(--botoms-line);
+    border-radius: 12px;
+    background-color: var(--botoms-white);
+  }
+
+  .botoms-length__head {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 4px 12px;
+    margin-bottom: 12px;
+  }
+
+  .botoms-length__heading,
+  .botoms-length__this {
+    margin: 0;
+    font-size: 0.9375rem;
+  }
+
+  .botoms-length__heading {
+    font-weight: 500;
+    color: var(--botoms-ink);
+  }
+
+  .botoms-length__this {
+    color: var(--botoms-muted-ink);
+  }
+
+  .botoms-length__body {
+    display: grid;
+    grid-template-columns: 72px minmax(0, 1fr);
+    gap: 16px;
+    align-items: start;
+  }
+
+  .botoms-length__figure {
+    width: 72px;
+    height: auto;
+  }
+
+  .botoms-length__legs {
+    fill: var(--botoms-photo-white);
+    stroke: var(--botoms-control);
+    stroke-width: 1;
+  }
+
+  .botoms-length__floor {
+    stroke: var(--botoms-control);
+    stroke-width: 1;
+  }
+
+  .botoms-length__ankle {
+    stroke: var(--botoms-control);
+    stroke-width: 0.75;
+    stroke-dasharray: 2 2;
+  }
+
+  .botoms-length__hem {
+    stroke: var(--botoms-forest);
+    stroke-width: 3;
+    stroke-linecap: round;
+    transition: transform 0.25s ease;
+  }
+
+  .botoms-length__controls {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .botoms-length__label {
+    font-size: 0.875rem;
+    color: var(--botoms-muted-ink);
+  }
+
+  .botoms-length__select {
+    min-height: 44px;
+    padding: 8px 12px;
+    border: 1px solid var(--botoms-control);
+    border-radius: 4px;
+    background-color: var(--botoms-white);
+    color: var(--botoms-ink);
+    font: inherit;
+  }
+
+  .botoms-length__result {
+    margin: 4px 0 0;
+    font-weight: 500;
+    color: var(--botoms-forest);
+  }
+
+  .botoms-length__note {
+    margin: 0;
+    font-size: 0.8125rem;
+    color: var(--botoms-muted-ink);
+  }
+
+  .botoms-length__others {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 16px;
+    margin: 6px 0 0;
+    padding: 0;
+    list-style: none;
+    font-size: 0.875rem;
+  }
+
+  .botoms-length__others a {
+    color: var(--botoms-ink);
+    text-underline-offset: 3px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .botoms-length__hem {
+      transition: none;
+    }
+  }
+{% endstylesheet %}
+
+{% javascript %}
+  class BotomsLengthGuide extends HTMLElement {
+    connectedCallback() {
+      this.select = this.querySelector('[data-height]');
+      this.hem = this.querySelector('[data-hem]');
+      this.result = this.querySelector('[data-result]');
+      this.inseam = Number(this.dataset.inseam);
+      if (!this.select || !this.inseam) return;
+
+      try {
+        const saved = localStorage.getItem('botoms:height');
+        if (saved && this.select.querySelector(`option[value="${saved}"]`)) this.select.value = saved;
+      } catch (error) {}
+
+      this.select.addEventListener('change', () => {
+        try {
+          localStorage.setItem('botoms:height', this.select.value);
+        } catch (error) {}
+        this.render();
+      });
+      this.render();
+    }
+
+    render() {
+      const height = Number(this.select.value);
+      const legInseam = height * 0.45;
+      const crotchY = 50;
+      const ankleY = 140;
+      const ratio = Math.min(this.inseam / legInseam, 1);
+      const hemY = crotchY + ratio * (ankleY - crotchY);
+      this.hem.style.transform = `translateY(${(hemY - ankleY).toFixed(1)}px)`;
+
+      const difference = Math.round(legInseam - this.inseam);
+      let text;
+      if (difference > 3) text = this.dataset.above.replace('[cm]', difference);
+      else if (difference >= -2) text = this.dataset.at;
+      else text = this.dataset.gathers.replace('[cm]', Math.abs(difference));
+      this.result.textContent = text;
+    }
+  }
+
+  if (!customElements.get('botoms-length-guide')) {
+    customElements.define('botoms-length-guide', BotomsLengthGuide);
+  }
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "Botoms length guide",
+  "tag": null,
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Uses the product's Length, Inseam (cm) and Style group metafields."
+    }
+  ],
+  "presets": [{ "name": "Botoms length guide" }]
+}
+{% endschema %}

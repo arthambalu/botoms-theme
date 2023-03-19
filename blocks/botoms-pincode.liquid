@@ -1,0 +1,136 @@
+<botoms-pincode
+  class="botoms-pincode"
+  data-invalid="{{ 'botoms.product.pincode_invalid' | t | escape }}"
+  data-result="{{ 'botoms.product.pincode_result' | t: pincode: '[pincode]' | escape }}"
+  {{ block.shopify_attributes }}
+>
+  <form class="botoms-pincode__form" novalidate>
+    <label class="botoms-pincode__label" for="Pincode-{{ block.id }}">{{ 'botoms.product.pincode' | t }}</label>
+    <div class="botoms-pincode__row">
+      <input
+        class="botoms-pincode__input"
+        id="Pincode-{{ block.id }}"
+        name="pincode"
+        type="text"
+        inputmode="numeric"
+        autocomplete="postal-code"
+        maxlength="6"
+        pattern="[1-9][0-9]{5}"
+        placeholder="{{ 'botoms.product.pincode_placeholder' | t }}"
+        aria-describedby="PincodeResult-{{ block.id }}"
+      >
+      <button type="submit" class="button button-secondary botoms-pincode__submit">{{ 'botoms.product.pincode_submit' | t }}</button>
+    </div>
+    <p class="botoms-pincode__message" id="PincodeResult-{{ block.id }}" aria-live="polite" data-message></p>
+  </form>
+</botoms-pincode>
+
+{% stylesheet %}
+  .botoms-pincode {
+    display: block;
+    width: 100%;
+  }
+
+  .botoms-pincode__label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    color: var(--botoms-ink);
+  }
+
+  .botoms-pincode__row {
+    display: flex;
+    gap: 8px;
+  }
+
+  .botoms-pincode__input {
+    flex: 1 1 auto;
+    min-width: 0;
+    min-height: 44px;
+    padding: 8px 12px;
+    border: 1px solid var(--botoms-control);
+    border-radius: 4px;
+    background-color: var(--botoms-white);
+    color: var(--botoms-ink);
+    font: inherit;
+    letter-spacing: 0.08em;
+  }
+
+  .botoms-pincode__submit {
+    flex: 0 0 auto;
+  }
+
+  .botoms-pincode__message {
+    margin: 6px 0 0;
+    font-size: 0.875rem;
+    color: var(--botoms-forest);
+  }
+
+  .botoms-pincode__message:empty {
+    display: none;
+  }
+
+  .botoms-pincode__message.is-error {
+    color: var(--botoms-rose);
+  }
+{% endstylesheet %}
+
+{% javascript %}
+  class BotomsPincode extends HTMLElement {
+    connectedCallback() {
+      this.form = this.querySelector('form');
+      this.input = this.querySelector('input');
+      this.message = this.querySelector('[data-message]');
+      if (!this.form) return;
+
+      try {
+        const saved = localStorage.getItem('botoms:pincode');
+        if (saved) this.input.value = saved;
+      } catch (error) {}
+
+      this.input.addEventListener('input', () => {
+        this.input.value = this.input.value.replace(/\D/g, '').slice(0, 6);
+        this.message.textContent = '';
+        this.input.removeAttribute('aria-invalid');
+      });
+      this.form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        this.check();
+      });
+    }
+
+    check() {
+      const pincode = this.input.value;
+      const valid = /^[1-9][0-9]{5}$/.test(pincode);
+      this.message.classList.toggle('is-error', !valid);
+      if (!valid) {
+        this.input.setAttribute('aria-invalid', 'true');
+        this.message.textContent = this.dataset.invalid;
+        return;
+      }
+      try {
+        localStorage.setItem('botoms:pincode', pincode);
+      } catch (error) {}
+      this.message.textContent = this.dataset.result.replace('[pincode]', pincode);
+    }
+  }
+
+  if (!customElements.get('botoms-pincode')) {
+    customElements.define('botoms-pincode', BotomsPincode);
+  }
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "Botoms pincode check",
+  "tag": null,
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Pincode slot. Validates the pincode; live delivery dates connect with Shiprocket later."
+    }
+  ],
+  "presets": [{ "name": "Botoms pincode check" }]
+}
+{% endschema %}

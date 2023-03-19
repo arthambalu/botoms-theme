@@ -1,0 +1,209 @@
+{%- liquid
+  assign pairs_colours = product.metafields.custom.pairs_with_colours.value
+  assign style_group = product.metafields.custom.style_group.value
+  assign more_collection = section.settings.collection
+  assign shown_ids = ',' | append: product.id | append: ','
+-%}
+
+{%- capture siblings -%}
+  {%- if style_group != blank -%}
+    {%- for sibling in style_group.products limit: 8 -%}
+      {%- unless sibling.id == product.id -%}
+        {%- render 'botoms-mini-card', card_product: sibling -%}
+      {%- endunless -%}
+    {%- endfor -%}
+  {%- endif -%}
+{%- endcapture -%}
+
+{%- if style_group != blank -%}
+  {%- for sibling in style_group.products limit: 8 -%}
+    {%- assign shown_ids = shown_ids | append: sibling.id | append: ',' -%}
+  {%- endfor -%}
+{%- endif -%}
+
+{%- capture more -%}
+  {%- if more_collection != blank -%}
+    {%- assign more_count = 0 -%}
+    {%- for candidate in more_collection.products limit: 12 -%}
+      {%- assign candidate_key = ',' | append: candidate.id | append: ',' -%}
+      {%- unless shown_ids contains candidate_key or more_count >= section.settings.limit -%}
+        {%- render 'botoms-mini-card', card_product: candidate -%}
+        {%- assign more_count = more_count | plus: 1 -%}
+      {%- endunless -%}
+    {%- endfor -%}
+  {%- endif -%}
+{%- endcapture -%}
+
+{%- assign siblings = siblings | strip -%}
+{%- assign more = more | strip -%}
+
+{%- if pairs_colours != blank or siblings != blank or more != blank -%}
+  <div
+    class="botoms-pairs"
+    style="--pairs-padding-top: {{ section.settings.padding-block-start }}px; --pairs-padding-bottom: {{ section.settings.padding-block-end }}px;"
+  >
+    <div class="botoms-pairs__inner">
+      <h2 class="botoms-pairs__heading">{{ 'botoms.product.pairs_heading' | t }}</h2>
+
+      {%- if pairs_colours != blank -%}
+        <div class="botoms-pairs__colours">
+          <p class="botoms-pairs__label">{{ 'botoms.product.pairs_goes_with' | t }}</p>
+          <ul class="botoms-pairs__dots">
+            {%- for colour in pairs_colours -%}
+              <li><span class="botoms-pairs__dot" style="--dot: {{ colour }};"></span></li>
+            {%- endfor -%}
+          </ul>
+        </div>
+      {%- endif -%}
+
+      {%- if siblings != blank -%}
+        <p class="botoms-pairs__label">{{ 'botoms.product.pairs_other_lengths' | t }}</p>
+        <ul class="botoms-pairs__row">{{ siblings }}</ul>
+      {%- endif -%}
+
+      {%- if more != blank -%}
+        <p class="botoms-pairs__label">{{ 'botoms.product.pairs_more' | t }}</p>
+        <ul class="botoms-pairs__row">{{ more }}</ul>
+      {%- endif -%}
+    </div>
+  </div>
+{%- endif -%}
+
+{% stylesheet %}
+  .botoms-pairs {
+    padding: var(--pairs-padding-top) 0 var(--pairs-padding-bottom);
+    background-color: var(--botoms-cream);
+    color: var(--botoms-ink);
+  }
+
+  .botoms-pairs__inner {
+    max-width: var(--page-width, 1200px);
+    margin-inline: auto;
+  }
+
+  .botoms-pairs__heading {
+    margin: 0 0 16px;
+    padding-inline: 16px;
+    font-family: var(--font-heading--family);
+    font-weight: var(--font-heading--weight);
+    font-size: clamp(1.5rem, 1.25rem + 1vw, 2rem);
+  }
+
+  .botoms-pairs__label {
+    margin: 20px 0 10px;
+    padding-inline: 16px;
+    font-weight: 500;
+    font-size: 0.9375rem;
+  }
+
+  .botoms-pairs__colours {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px 12px;
+  }
+
+  .botoms-pairs__colours .botoms-pairs__label {
+    margin: 0;
+    padding-inline: 16px 0;
+  }
+
+  .botoms-pairs__dots {
+    display: flex;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .botoms-pairs__dot {
+    display: block;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background-color: var(--dot);
+    box-shadow: inset 0 0 0 1px rgb(var(--botoms-ink-rgb) / 0.15);
+  }
+
+  .botoms-pairs__row {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 42vw;
+    gap: 12px;
+    margin: 0;
+    padding: 0 16px 4px;
+    list-style: none;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: 16px;
+    scrollbar-width: none;
+  }
+
+  .botoms-pairs__row::-webkit-scrollbar {
+    display: none;
+  }
+
+  @media screen and (min-width: 750px) {
+    .botoms-pairs__heading,
+    .botoms-pairs__label,
+    .botoms-pairs__colours .botoms-pairs__label {
+      padding-inline: 40px;
+    }
+
+    .botoms-pairs__colours .botoms-pairs__label {
+      padding-inline-end: 0;
+    }
+
+    .botoms-pairs__row {
+      grid-auto-columns: 220px;
+      padding-inline: 40px;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Botoms pairs with kurti",
+  "tag": "section",
+  "class": "section-botoms-pairs-with",
+  "enabled_on": { "templates": ["product"] },
+  "settings": [
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Complete the look from",
+      "info": "Other bottoms to suggest, e.g. Ethnic wear. The current product and its other lengths are skipped."
+    },
+    {
+      "type": "range",
+      "id": "limit",
+      "label": "Products to show",
+      "min": 2,
+      "max": 8,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "Top padding",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 32
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "Bottom padding",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 48
+    }
+  ],
+  "presets": [{ "name": "Botoms pairs with kurti" }]
+}
+{% endschema %}

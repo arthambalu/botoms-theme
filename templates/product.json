@@ -25,10 +25,10 @@
             "slideshow_mobile_controls_style": "dots",
             "thumbnail_position": "right",
             "thumbnail_width": 44,
-            "aspect_ratio": "adapt",
+            "aspect_ratio": "1/1.25",
             "constrain_to_viewport": true,
             "media_fit": "contain",
-            "media_radius": 0,
+            "media_radius": 8,
             "extend_media": false,
             "zoom": true,
             "video_loop": false,
@@ -172,7 +172,7 @@
               "type": "variant-picker",
               "settings": {
                 "variant_style": "buttons",
-                "show_swatches": false,
+                "show_swatches": true,
                 "alignment": "left",
                 "padding-block-start": 0,
                 "padding-block-end": 0,
@@ -240,13 +240,33 @@
                 "padding-inline-end": 0
               },
               "blocks": {}
+            },
+            "botoms_size_help": {
+              "type": "botoms-size-help",
+              "settings": {}
+            },
+            "botoms_length_guide": {
+              "type": "botoms-length-guide",
+              "settings": {}
+            },
+            "botoms_pincode": {
+              "type": "botoms-pincode",
+              "settings": {}
+            },
+            "botoms_feel_meter": {
+              "type": "botoms-feel-meter",
+              "settings": {}
             }
           },
           "block_order": [
             "group_icgrde",
             "divider_VJhene",
             "variant_picker_R3rGDr",
+            "botoms_size_help",
+            "botoms_length_guide",
             "buy_buttons_eYQEYi",
+            "botoms_pincode",
+            "botoms_feel_meter",
             "text_aEtTtq"
           ]
         },
@@ -406,10 +426,20 @@
         "padding-block-start": 48,
         "padding-block-end": 48
       }
+    },
+    "botoms_pairs_with": {
+      "type": "botoms-pairs-with",
+      "settings": {
+        "collection": "ethnic-wear",
+        "limit": 4,
+        "padding-block-start": 32,
+        "padding-block-end": 32
+      }
     }
   },
   "order": [
     "main",
+    "botoms_pairs_with",
     "product_recommendations_qggXJq"
   ]
 }

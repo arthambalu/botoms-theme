@@ -1,0 +1,116 @@
+{%- liquid
+  assign feel_product = closest.product
+  assign feel_keys = 'stretch,coverage,softness,thickness' | split: ','
+  assign has_feel = false
+  for key in feel_keys
+    if feel_product.metafields.custom[key] != blank
+      assign has_feel = true
+    endif
+  endfor
+-%}
+
+{%- if has_feel -%}
+  <div class="botoms-feel" {{ block.shopify_attributes }}>
+    <p class="botoms-feel__heading">{{ 'botoms.product.feel' | t }}</p>
+    <dl class="botoms-feel__list">
+      {%- for key in feel_keys -%}
+        {%- assign feel_field = feel_product.metafields.custom[key] -%}
+        {%- if feel_field != blank -%}
+          {%- assign feel_value = feel_field.value | at_least: 1 | at_most: 4 -%}
+          {%- assign label_key = 'botoms.product.feel_' | append: key -%}
+          {%- assign word_key = label_key | append: '_' | append: feel_value -%}
+          <div class="botoms-feel__row">
+            <dt>{{ label_key | t }}</dt>
+            <dd>
+              <span
+                class="botoms-feel__bar"
+                role="img"
+                aria-label="{{ 'botoms.product.feel_value' | t: value: feel_value, max: 4 }}"
+              >
+                {%- for i in (1..4) -%}
+                  <i{% if i <= feel_value %} class="is-on"{% endif %}></i>
+                {%- endfor -%}
+              </span>
+              <span class="botoms-feel__word">{{ word_key | t }}</span>
+            </dd>
+          </div>
+        {%- endif -%}
+      {%- endfor -%}
+    </dl>
+  </div>
+{%- endif -%}
+
+{% stylesheet %}
+  .botoms-feel {
+    width: 100%;
+  }
+
+  .botoms-feel__heading {
+    margin: 0 0 10px;
+    font-weight: 500;
+    font-size: 0.9375rem;
+    color: var(--botoms-ink);
+  }
+
+  .botoms-feel__list {
+    display: grid;
+    gap: 10px;
+    margin: 0;
+  }
+
+  .botoms-feel__row {
+    display: grid;
+    grid-template-columns: 88px minmax(0, 1fr);
+    align-items: center;
+    gap: 12px;
+    font-size: 0.875rem;
+  }
+
+  .botoms-feel__row dt {
+    color: var(--botoms-muted-ink);
+  }
+
+  .botoms-feel__row dd {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 0;
+  }
+
+  .botoms-feel__bar {
+    display: flex;
+    flex: 1 1 auto;
+    gap: 4px;
+    max-width: 180px;
+  }
+
+  .botoms-feel__bar i {
+    flex: 1;
+    height: 6px;
+    border-radius: 3px;
+    background-color: var(--botoms-line);
+  }
+
+  .botoms-feel__bar i.is-on {
+    background-color: var(--botoms-forest);
+  }
+
+  .botoms-feel__word {
+    min-width: 80px;
+    color: var(--botoms-ink);
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Botoms feel meter",
+  "tag": null,
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Shows the product's Stretch, Coverage, Softness and Thickness metafields (1 to 4)."
+    }
+  ],
+  "presets": [{ "name": "Botoms feel meter" }]
+}
+{% endschema %}

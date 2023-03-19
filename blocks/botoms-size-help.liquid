@@ -1,0 +1,336 @@
+{%- liquid
+  assign help_product = closest.product
+  assign model_info = help_product.metafields.custom.model_info.value
+  assign chart = help_product.metafields.custom.size_chart.value
+  if chart != blank
+    assign rows = chart.measurements.value
+    assign unit = chart.unit.value | default: 'cm'
+  endif
+-%}
+
+{%- if model_info != blank or chart != blank -%}
+  <botoms-size-help class="botoms-size-help" {{ block.shopify_attributes }}>
+    {%- if model_info != blank -%}
+      <p class="botoms-size-help__model">
+        <span class="visually-hidden">{{ 'botoms.product.model_info' | t }}: </span>{{ model_info }}
+      </p>
+    {%- endif -%}
+
+    {%- if chart != blank -%}
+      <button type="button" class="botoms-size-help__open" data-open>
+        <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" width="18" height="18"><path d="M3 8h18v8H3zM7 8v3M11 8v4M15 8v3M19 8v4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+        {{ 'botoms.product.size_chart' | t }}
+      </button>
+
+      <dialog class="botoms-size-help__dialog" data-dialog aria-labelledby="SizeChartTitle-{{ block.id }}">
+        <div class="botoms-size-help__panel">
+          <div class="botoms-size-help__top">
+            <h2 class="botoms-size-help__title" id="SizeChartTitle-{{ block.id }}">{{ chart.name.value }}</h2>
+            <button type="button" class="botoms-size-help__close" data-close aria-label="{{ 'botoms.product.size_chart_close' | t }}">
+              <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" width="20" height="20"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/></svg>
+            </button>
+          </div>
+
+          <p class="botoms-size-help__unit">{{ 'botoms.product.measurements_in' | t: unit: unit }}</p>
+          <table class="botoms-size-help__table">
+            <thead>
+              <tr>
+                <th scope="col">{{ 'botoms.product.size' | t }}</th>
+                <th scope="col">{{ 'botoms.product.waist' | t }}</th>
+                <th scope="col">{{ 'botoms.product.hip' | t }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {%- for row in rows -%}
+                <tr data-size="{{ row.size }}">
+                  <th scope="row">{{ row.size }}</th>
+                  <td>{{ row.waist[0] }}–{{ row.waist[1] }}</td>
+                  <td>{{ row.hip[0] }}–{{ row.hip[1] }}</td>
+                </tr>
+              {%- endfor -%}
+            </tbody>
+          </table>
+
+          <form class="botoms-size-help__finder" data-finder novalidate>
+            <p class="botoms-size-help__finder-title">{{ 'botoms.product.fit_finder' | t }}</p>
+            <p class="botoms-size-help__hint">{{ 'botoms.product.fit_finder_hint' | t }}</p>
+            <div class="botoms-size-help__fields">
+              <label>
+                <span>{{ 'botoms.product.waist' | t }}</span>
+                <input type="number" inputmode="decimal" min="40" max="160" step="0.5" name="waist" required>
+              </label>
+              <label>
+                <span>{{ 'botoms.product.hip' | t }}</span>
+                <input type="number" inputmode="decimal" min="60" max="180" step="0.5" name="hip" required>
+              </label>
+              <button type="submit" class="button">{{ 'botoms.product.fit_finder_submit' | t }}</button>
+            </div>
+            <p class="botoms-size-help__result" data-result aria-live="polite"></p>
+            <button type="button" class="button button-secondary botoms-size-help__select" data-select hidden></button>
+          </form>
+
+          {%- if chart.how_to_measure != blank -%}
+            <div class="botoms-size-help__measure">{{ chart.how_to_measure | metafield_tag }}</div>
+          {%- endif -%}
+        </div>
+      </dialog>
+
+      <script type="application/json" data-chart>{{ rows | json }}</script>
+      <template data-strings>
+        <span data-key="result">{{ 'botoms.product.fit_finder_result' | t: size: '[size]' }}</span>
+        <span data-key="select">{{ 'botoms.product.fit_finder_select' | t: size: '[size]' }}</span>
+        <span data-key="none">{{ 'botoms.product.fit_finder_none' | t }}</span>
+        <span data-key="invalid">{{ 'botoms.product.fit_finder_invalid' | t }}</span>
+      </template>
+    {%- endif -%}
+  </botoms-size-help>
+{%- endif -%}
+
+{% stylesheet %}
+  .botoms-size-help {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px 16px;
+    width: 100%;
+  }
+
+  .botoms-size-help__model {
+    margin: 0;
+    font-size: 0.875rem;
+    color: var(--botoms-muted-ink);
+  }
+
+  .botoms-size-help__open {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 44px;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--botoms-ink);
+    font: inherit;
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    cursor: pointer;
+  }
+
+  .botoms-size-help__dialog {
+    width: min(560px, 100vw - 32px);
+    max-height: min(88vh, 760px);
+    padding: 0;
+    border: 0;
+    border-radius: 16px;
+    background-color: var(--botoms-cream);
+    color: var(--botoms-ink);
+    box-shadow: 0 24px 64px -16px rgb(var(--botoms-ink-rgb) / 0.4);
+  }
+
+  .botoms-size-help__dialog::backdrop {
+    background: rgb(var(--botoms-ink-rgb) / 0.45);
+  }
+
+  .botoms-size-help__panel {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 20px;
+  }
+
+  .botoms-size-help__top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .botoms-size-help__title {
+    margin: 0;
+    font-family: var(--font-heading--family);
+    font-weight: var(--font-heading--weight);
+    font-size: 1.375rem;
+  }
+
+  .botoms-size-help__close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border: 1px solid var(--botoms-control);
+    border-radius: 50%;
+    background: transparent;
+    color: var(--botoms-ink);
+    cursor: pointer;
+  }
+
+  .botoms-size-help__unit,
+  .botoms-size-help__hint {
+    margin: 0;
+    font-size: 0.8125rem;
+    color: var(--botoms-muted-ink);
+  }
+
+  .botoms-size-help__table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9375rem;
+    text-align: left;
+  }
+
+  .botoms-size-help__table th,
+  .botoms-size-help__table td {
+    padding: 10px 8px;
+    border-bottom: 1px solid var(--botoms-line);
+  }
+
+  .botoms-size-help__table thead th {
+    font-weight: 500;
+    color: var(--botoms-muted-ink);
+  }
+
+  .botoms-size-help__table tr.is-recommended {
+    background-color: var(--botoms-butterfly);
+  }
+
+  .botoms-size-help__finder {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 16px;
+    border-radius: 12px;
+    background-color: var(--botoms-white);
+  }
+
+  .botoms-size-help__finder-title {
+    margin: 0;
+    font-weight: 500;
+  }
+
+  .botoms-size-help__fields {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .botoms-size-help__fields label {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 0.875rem;
+    color: var(--botoms-muted-ink);
+  }
+
+  .botoms-size-help__fields input {
+    min-height: 44px;
+    padding: 8px 12px;
+    border: 1px solid var(--botoms-control);
+    border-radius: 4px;
+    background-color: var(--botoms-white);
+    color: var(--botoms-ink);
+    font: inherit;
+  }
+
+  .botoms-size-help__fields .button {
+    grid-column: 1 / -1;
+  }
+
+  .botoms-size-help__result {
+    margin: 0;
+    font-weight: 500;
+    color: var(--botoms-forest);
+  }
+
+  .botoms-size-help__result:empty {
+    display: none;
+  }
+
+  .botoms-size-help__measure {
+    font-size: 0.875rem;
+    line-height: 1.55;
+    color: var(--botoms-muted-ink);
+  }
+{% endstylesheet %}
+
+{% javascript %}
+  class BotomsSizeHelp extends HTMLElement {
+    connectedCallback() {
+      this.dialog = this.querySelector('[data-dialog]');
+      if (!this.dialog) return;
+      this.rows = JSON.parse(this.querySelector('[data-chart]')?.textContent || '[]');
+      this.strings = Object.fromEntries(
+        Array.from(this.querySelector('[data-strings]').content.querySelectorAll('[data-key]')).map((el) => [el.dataset.key, el.textContent])
+      );
+      this.result = this.querySelector('[data-result]');
+      this.selectButton = this.querySelector('[data-select]');
+
+      this.querySelector('[data-open]').addEventListener('click', () => this.dialog.showModal());
+      this.querySelector('[data-close]').addEventListener('click', () => this.dialog.close());
+      this.dialog.addEventListener('click', (event) => {
+        if (event.target === this.dialog) this.dialog.close();
+      });
+      this.querySelector('[data-finder]').addEventListener('submit', (event) => {
+        event.preventDefault();
+        this.find(new FormData(event.target));
+      });
+      this.selectButton.addEventListener('click', () => this.selectSize(this.selectButton.dataset.size));
+    }
+
+    find(data) {
+      const waist = parseFloat(data.get('waist'));
+      const hip = parseFloat(data.get('hip'));
+      this.querySelectorAll('tr.is-recommended').forEach((row) => row.classList.remove('is-recommended'));
+      this.selectButton.hidden = true;
+
+      if (!waist || !hip) {
+        this.result.textContent = this.strings.invalid;
+        return;
+      }
+      const match = this.rows.find((row) => waist <= row.waist[1] && hip <= row.hip[1]);
+      if (!match) {
+        this.result.textContent = this.strings.none;
+        return;
+      }
+      this.result.textContent = this.strings.result.replace('[size]', match.size);
+      this.querySelector(`tr[data-size="${CSS.escape(match.size)}"]`)?.classList.add('is-recommended');
+      this.selectButton.dataset.size = match.size;
+      this.selectButton.textContent = this.strings.select.replace('[size]', match.size);
+      this.selectButton.hidden = !this.sizeInput(match.size);
+    }
+
+    sizeInput(size) {
+      const scope = this.closest('.product-information, product-information, main') || document;
+      return Array.from(scope.querySelectorAll('variant-picker input[type="radio"]')).find((input) => input.value === size);
+    }
+
+    selectSize(size) {
+      const input = this.sizeInput(size);
+      if (!input) return;
+      this.dialog.close();
+      (input.labels?.[0] || input).click();
+      input.focus({ preventScroll: true });
+    }
+  }
+
+  if (!customElements.get('botoms-size-help')) {
+    customElements.define('botoms-size-help', BotomsSizeHelp);
+  }
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "Botoms size help",
+  "tag": null,
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Shows Model info and a Size chart pop-up with a fit finder, from the product's metafields."
+    }
+  ],
+  "presets": [{ "name": "Botoms size help" }]
+}
+{% endschema %}
