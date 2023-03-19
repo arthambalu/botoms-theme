@@ -55,7 +55,7 @@
               "type": "text",
               "name": "t:names.heading",
               "settings": {
-                "text": "<h2>Join our email list</h2>",
+                "text": "<h2>Be first to the new colours</h2>",
                 "width": "100%",
                 "max_width": "normal",
                 "alignment": "left",
@@ -80,7 +80,7 @@
               "type": "text",
               "name": "t:names.text",
               "settings": {
-                "text": "<p>Get exclusive deals and early access to new products.</p>",
+                "text": "<p>New styles, colours and restocks, straight to your inbox. Unsubscribe any time.</p>",
                 "width": "100%",
                 "max_width": "normal",
                 "alignment": "left",
@@ -142,9 +142,9 @@
           "type": "menu",
           "settings": {
             "menu": "footer",
-            "heading": "",
+            "heading": "Help",
             "menu_spacing": 12,
-            "show_as_accordion": false,
+            "show_as_accordion": true,
             "accordion_icon": "plus",
             "accordion_dividers": false,
             "heading_preset": "paragraph",
@@ -158,10 +158,10 @@
         "menu_main": {
           "type": "menu",
           "settings": {
-            "menu": "main-menu",
-            "heading": "",
+            "menu": "footer-shop",
+            "heading": "Shop",
             "menu_spacing": 12,
-            "show_as_accordion": false,
+            "show_as_accordion": true,
             "accordion_icon": "plus",
             "accordion_dividers": false,
             "heading_preset": "paragraph",
@@ -193,7 +193,7 @@
         "copyright": {
           "type": "footer-copyright",
           "settings": {
-            "show_powered_by": true,
+            "show_powered_by": false,
             "font_size": "0.75rem",
             "case": "none"
           }
