@@ -12,7 +12,22 @@
 
   assign feature_image = section.settings.feature_image
   if feature_image == blank
-    assign feature_image = bento_products[1].featured_image | default: bento_products.first.featured_image
+    # A second product photo, so the tile doesn't repeat a picture from the gallery or the product cards.
+    assign featured_srcs = bento_products | map: 'featured_image' | map: 'src' | join: '|'
+    for bento_product in bento_products
+      for bento_image in bento_product.images offset: 1
+        unless featured_srcs contains bento_image.src
+          assign feature_image = bento_image
+          break
+        endunless
+      endfor
+      if feature_image != blank
+        break
+      endif
+    endfor
+    if feature_image == blank
+      assign feature_image = bento_products.first.featured_image
+    endif
   endif
   assign texture_image = section.settings.texture_image
 -%}
@@ -221,8 +236,8 @@
   .botoms-bento__statement {
     margin: auto 0 0;
     font-family: var(--font-heading--family);
-    font-size: clamp(2.75rem, 10vw, 4rem);
-    line-height: 1;
+    font-size: clamp(1.75rem, 7vw, 2.5rem);
+    line-height: 1.05;
     white-space: pre-line;
   }
 

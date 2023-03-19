@@ -186,12 +186,23 @@
                 "padding-inline-end": 0
               },
               "blocks": {}
+            },
+            "botoms_swatches": {
+              "type": "swatches",
+              "settings": {
+                "product_swatches_alignment": "flex-start",
+                "product_swatches_padding_top": 4,
+                "product_swatches_padding_bottom": 0,
+                "product_swatches_padding_left": 0,
+                "product_swatches_padding_right": 0
+              }
             }
           },
           "block_order": [
             "product_card_gallery_677WP3",
             "product_title_YXxMTj",
-            "price_JQzVV4"
+            "price_JQzVV4",
+            "botoms_swatches"
           ]
         }
       },
@@ -211,7 +222,7 @@
         "section_width": "page-width",
         "horizontal_alignment": "flex-start",
         "gap": 28,
-        "padding-block-start": 56,
+        "padding-block-start": 40,
         "padding-block-end": 64,
         "background_color": ""
       }
@@ -229,8 +240,8 @@
         "feature_title": "Good shape. Great possibilities.",
         "feature_link_label": "Find your fit",
         "feature_link": "shopify://pages/size-guide",
-        "statement_eyebrow": "The wardrobe equation",
-        "statement": "Less.\nBetter.",
+        "statement_eyebrow": "On every product page",
+        "statement": "Size chart.\nFit finder.\nLength guide.",
         "texture_eyebrow": "02 / A softer approach",
         "texture_title": "Feel the",
         "texture_title_italic": "difference.",
@@ -244,10 +255,25 @@
         "padding-block-start": 64,
         "padding-block-end": 64
       }
+    },
+    "botoms_silhouettes": {
+      "type": "botoms-silhouette-links",
+      "settings": {
+        "heading": "Shop by silhouette",
+        "collections": [
+          "leggings",
+          "kurti-pants",
+          "palazzo-wide-leg",
+          "active"
+        ],
+        "padding-block-start": 32,
+        "padding-block-end": 0
+      }
     }
   },
   "order": [
     "botoms_dual_hero",
+    "botoms_silhouettes",
     "product_list_fa6P9H",
     "botoms_essentials_bento"
   ]

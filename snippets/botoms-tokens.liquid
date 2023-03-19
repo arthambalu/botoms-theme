@@ -135,7 +135,25 @@
     --button-background-color: var(--botoms-white);
   }
 
+  /* Product cards: the "choose options" quick add is a visible, labelled blush pill ("Choose size"),
+     not an icon that only expands on desktop hover. */
+  product-card button.quick-add__button--choose {
+    --quick-add-background: var(--botoms-pink-cherub);
+    --quick-add-foreground: var(--botoms-ink);
+
+    width: auto;
+    padding-inline: 2px 14px;
+    border: 0;
+    color: var(--botoms-ink);
+    font-size: 0.8125rem;
+    opacity: 1;
+  }
+
   /* Footer (all pages): brand column, eyebrow menu headings, full-width wordmark. */
+  .footer-content .group-block:has(.email-signup__input) {
+    border: 1px solid var(--botoms-line);
+  }
+
   .footer-content > jumbo-text {
     grid-column: 1 / -1;
     margin-top: 16px;
