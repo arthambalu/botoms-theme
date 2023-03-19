@@ -1,0 +1,183 @@
+{%- doc -%}
+  Explicit size choice. Horizon pre-selects the first size (XS), which invites wrong-size orders, so until the
+  shopper taps a size: no size looks selected, and Add to cart, the sticky bar and Buy it now ask for a size first.
+  Works on the product page and in quick add. Rendered once, from `botoms-tokens` (in <head>).
+
+  @example
+  {% render 'botoms-size-required' %}
+{%- enddoc -%}
+
+{%- comment -%} Set before first paint so the pre-selected size never flashes as chosen. {%- endcomment -%}
+<script>
+  document.documentElement.setAttribute('data-botoms-size-guard', '');
+</script>
+<script type="application/json" id="botoms-size-required-strings">
+  {{ 'botoms.product.choose_size' | t | json }}
+</script>
+
+{% stylesheet %}
+  /* Until a size is chosen the checked size looks like the others; a chosen product sets the --botoms-size-* values. */
+  [data-botoms-size-guard] fieldset:has(input[data-option-name='Size' i]) .variant-option__button-label:has(:checked) {
+    --variant-picker-stroke-color: var(--botoms-size-border, var(--color-variant-border));
+
+    color: var(--botoms-size-text, var(--color-variant-text));
+    border-color: var(--botoms-size-border, var(--color-variant-border));
+  }
+
+  [data-botoms-size-guard] fieldset:has(input[data-option-name='Size' i]) .variant-option__button-label:has(:checked) .variant-option__button-label__pill {
+    opacity: var(--botoms-size-pill, 0);
+  }
+
+  .botoms-size-required {
+    flex-basis: 100%;
+    grid-column: 1 / -1;
+    margin: 4px 0 0;
+    color: var(--botoms-rose);
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+
+  [data-botoms-size-error] .variant-option__button-label:not(:has([data-option-available='false'])) {
+    animation: botoms-size-nudge 0.4s ease;
+  }
+
+  @keyframes botoms-size-nudge {
+    25% { transform: translateX(-3px); }
+    75% { transform: translateX(3px); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    [data-botoms-size-error] .variant-option__button-label {
+      animation: none;
+    }
+  }
+{% endstylesheet %}
+
+{% javascript %}
+  (() => {
+    if (window.BotomsSizeRequired) return;
+
+    const SIZE_INPUT = 'input[data-option-name="Size" i]';
+    const SIZE_FIELDSET = `fieldset:has(${SIZE_INPUT})`;
+    const ADD_TRIGGERS = '[name="add"], sticky-add-to-cart [ref="addToCartButton"], .shopify-payment-button';
+    const chosen = new Set();
+    const style = document.createElement('style');
+    document.head.append(style);
+
+    const message = () => {
+      try {
+        return JSON.parse(document.getElementById('botoms-size-required-strings').textContent);
+      } catch (error) {
+        return 'Please choose your size';
+      }
+    };
+
+    const markChosen = (productId) => {
+      if (!productId || chosen.has(productId)) return;
+      chosen.add(productId);
+      style.textContent = `${[...chosen].map((id) => `variant-picker[data-product-id="${CSS.escape(id)}"]`).join(',')} {
+        --botoms-size-text: var(--color-selected-variant-text);
+        --botoms-size-border: var(--color-selected-variant-border);
+        --botoms-size-pill: 1;
+      }`;
+      document.querySelectorAll(`variant-picker[data-product-id="${CSS.escape(productId)}"] ${SIZE_FIELDSET}`).forEach((fieldset) => {
+        fieldset.removeAttribute('data-botoms-size-error');
+        fieldset.querySelector('.botoms-size-required')?.remove();
+      });
+    };
+
+    // Size pickers with a single size need no choice.
+    const markSingleSizes = () => {
+      document.querySelectorAll('variant-picker[data-product-id]').forEach((picker) => {
+        const fieldset = picker.querySelector(SIZE_FIELDSET);
+        if (!fieldset || fieldset.querySelectorAll(SIZE_INPUT).length < 2) markChosen(picker.dataset.productId);
+      });
+    };
+
+    // Only a visible size picker in the same section or quick-add dialog (cards have none).
+    const sizeFieldsetFor = (trigger, productId) => {
+      const selector = `variant-picker[data-product-id="${CSS.escape(productId)}"] ${SIZE_FIELDSET}`;
+      const fieldset = trigger.closest('dialog, .shopify-section')?.querySelector(selector);
+      return fieldset?.checkVisibility() ? fieldset : null;
+    };
+
+    const askForSize = (fieldset) => {
+      fieldset.removeAttribute('data-botoms-size-error');
+      void fieldset.offsetWidth;
+      fieldset.setAttribute('data-botoms-size-error', '');
+      let note = fieldset.querySelector('.botoms-size-required');
+      if (!note) {
+        note = document.createElement('p');
+        note.className = 'botoms-size-required';
+        note.setAttribute('role', 'alert');
+        fieldset.append(note);
+      }
+      note.textContent = message();
+      const smooth = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      fieldset.scrollIntoView({ behavior: smooth ? 'smooth' : 'auto', block: 'center' });
+      fieldset.querySelector(`${SIZE_INPUT}:not([data-option-available="false"])`)?.focus({ preventScroll: true });
+    };
+
+    // Capture phase on window runs before Horizon's own click handlers.
+    window.addEventListener(
+      'click',
+      (event) => {
+        if (!(event.target instanceof Element)) return;
+
+        const sizeLabel = event.target.closest('.variant-option__button-label');
+        if (sizeLabel?.querySelector(SIZE_INPUT)) {
+          markChosen(sizeLabel.closest('variant-picker')?.dataset.productId);
+          return;
+        }
+
+        const trigger = event.target.closest(ADD_TRIGGERS);
+        if (!trigger) return;
+        const productId = trigger.closest('[data-product-id]')?.dataset.productId;
+        if (!productId || chosen.has(productId)) return;
+        markSingleSizes();
+        if (chosen.has(productId)) return;
+        const fieldset = sizeFieldsetFor(trigger, productId);
+        if (!fieldset) return;
+
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        askForSize(fieldset);
+      },
+      true
+    );
+
+    window.addEventListener(
+      'change',
+      (event) => {
+        if (event.target instanceof Element && event.target.matches(SIZE_INPUT)) {
+          markChosen(event.target.closest('variant-picker')?.dataset.productId);
+        }
+      },
+      true
+    );
+
+    // Enter in the quantity field submits the form without a click.
+    window.addEventListener(
+      'submit',
+      (event) => {
+        const form = event.target;
+        if (!(form instanceof HTMLFormElement) || !form.closest('product-form-component')) return;
+        const productId = form.closest('[data-product-id]')?.dataset.productId;
+        if (!productId || chosen.has(productId)) return;
+        markSingleSizes();
+        if (chosen.has(productId)) return;
+        const fieldset = sizeFieldsetFor(form, productId);
+        if (!fieldset) return;
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        askForSize(fieldset);
+      },
+      true
+    );
+
+    document.addEventListener('DOMContentLoaded', markSingleSizes);
+    if (document.readyState !== 'loading') markSingleSizes();
+
+    window.BotomsSizeRequired = { chosen };
+  })();
+{% endjavascript %}

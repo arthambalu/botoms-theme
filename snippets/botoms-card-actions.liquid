@@ -4,6 +4,7 @@
 
   @param {product} card_product - The product on the card
   @param {boolean} [show_share] - Show the share button, default true
+  @param {boolean} [inline] - Lay the buttons out in a row in the page flow (product page) instead of over a photo
 
   @example
   {% render 'botoms-card-actions', card_product: product %}
@@ -17,7 +18,7 @@
   endif
 -%}
 
-<div class="botoms-card-actions">
+<div class="botoms-card-actions{% if inline %} botoms-card-actions--inline{% endif %}">
   <botoms-wishlist-button
     data-handle="{{ card_product.handle }}"
     data-label-add="{{ 'botoms.wishlist.add' | t: title: product_title }}"
@@ -62,6 +63,21 @@
     display: flex;
     flex-direction: column;
     gap: 6px;
+  }
+
+  .botoms-card-actions--inline {
+    position: static;
+    flex-direction: row;
+    flex-shrink: 0;
+    gap: 8px;
+  }
+
+  .botoms-card-actions--inline .botoms-card-actions__button {
+    width: 40px;
+    height: 40px;
+    border: 1px solid var(--botoms-line);
+    background: var(--botoms-white);
+    box-shadow: none;
   }
 
   .botoms-card-actions botoms-share-button {
@@ -117,6 +133,12 @@
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.15s ease;
+  }
+
+  .botoms-card-actions--inline .botoms-card-actions__toast {
+    top: calc(100% + 6px);
+    right: 0;
+    transform: none;
   }
 
   botoms-share-button[data-copied] .botoms-card-actions__toast {

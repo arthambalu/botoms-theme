@@ -1,0 +1,30 @@
+{%- doc -%}
+  Wishlist heart and share buttons for the product page, in a row next to the title.
+  Same behaviour as the product cards (`botoms-card-actions`): saved on this device, no like counts.
+{%- enddoc -%}
+
+{%- assign actions_product = closest.product -%}
+{%- if actions_product != blank -%}
+  <div class="botoms-product-actions" {{ block.shopify_attributes }}>
+    {% render 'botoms-card-actions', card_product: actions_product, inline: true %}
+  </div>
+{%- endif -%}
+
+{% stylesheet %}
+  .botoms-product-actions {
+    display: flex;
+    justify-content: flex-end;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Botoms save and share",
+  "settings": [],
+  "presets": [
+    {
+      "name": "Botoms save and share"
+    }
+  ]
+}
+{% endschema %}

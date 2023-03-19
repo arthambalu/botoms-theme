@@ -123,4 +123,24 @@
   [ref='priceContainer'] .price:has(~ .compare-at-price) {
     color: var(--botoms-rose);
   }
+
+  /* Product page: quantity is changed in the bag (design notes), so Add to bag gets the full row. */
+  .product-information .quantity-selector-wrapper,
+  .quick-add-modal .quantity-selector-wrapper {
+    display: none;
+  }
+
+  /* Sold-out sizes: greyed tile behind Horizon's strike line, so they read as unavailable at a glance. */
+  .variant-option__button-label:not(.variant-option__button-label--has-swatch):has([data-option-available='false']) {
+    background-color: var(--botoms-photo-white);
+    color: rgb(var(--botoms-ink-rgb) / 0.4);
+  }
+
+  @media screen and (min-width: 750px) {
+    .product-information {
+      padding-block-start: 24px;
+    }
+  }
 {% endstyle %}
+
+{% render 'botoms-size-required' %}
