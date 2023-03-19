@@ -101,6 +101,10 @@
       "pairs_more": "Complete the look",
       "choose_size": "Please choose your size"
     },
+    "home": {
+      "pause_motion": "Pause motion",
+      "play_motion": "Play motion"
+    },
     "wishlist": {
       "title": "Wishlist",
       "open": "Wishlist",

@@ -101,9 +101,11 @@
         "bubble_style": "custom",
         "bubble_background_color": "{{ settings.color_palette.color2 }}",
         "bubble_text_color": "{{ settings.color_palette.foreground }}",
-        "enable_transparent_header_home": false,
+        "enable_transparent_header_home": true,
         "enable_transparent_header_product": false,
-        "enable_transparent_header_collection": false
+        "enable_transparent_header_collection": false,
+        "home_inverse_logo": false,
+        "text_color_transparent_home": "#24301F"
       }
     }
   },

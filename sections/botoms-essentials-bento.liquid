@@ -1,0 +1,316 @@
+{%- comment -%}
+  Home editorial bento: a large photo tile, a short statement tile, a fabric tile and a quote tile.
+  Photos fall back to products from the chosen collection until real campaign images are set.
+{%- endcomment -%}
+
+{%- liquid
+  assign bento_collection = section.settings.collection
+  if bento_collection == blank
+    assign bento_collection = collections['shop-all']
+  endif
+  assign bento_products = bento_collection.products | where: 'featured_image'
+
+  assign feature_image = section.settings.feature_image
+  if feature_image == blank
+    assign feature_image = bento_products[1].featured_image | default: bento_products.first.featured_image
+  endif
+  assign texture_image = section.settings.texture_image
+-%}
+
+<div
+  class="botoms-bento"
+  style="--bento-padding-top: {{ section.settings.padding-block-start }}px; --bento-padding-bottom: {{ section.settings.padding-block-end }}px;"
+>
+  <div class="botoms-bento__head">
+    <div>
+      {%- if section.settings.eyebrow != blank -%}
+        <p class="botoms-bento__eyebrow">{{ section.settings.eyebrow }}</p>
+      {%- endif -%}
+      <h2 class="botoms-bento__heading">
+        {{- section.settings.heading -}}
+        {%- if section.settings.heading_italic != blank -%}
+          <em>{{ section.settings.heading_italic }}</em>
+        {%- endif -%}
+      </h2>
+    </div>
+    {%- if section.settings.link_label != blank and section.settings.link != blank -%}
+      <a class="botoms-bento__link" href="{{ section.settings.link }}">{{ section.settings.link_label }} <span aria-hidden="true">↘</span></a>
+    {%- endif -%}
+  </div>
+
+  <div class="botoms-bento__grid">
+    <a class="botoms-bento__tile botoms-bento__tile--feature" href="{{ section.settings.feature_link | default: bento_collection.url }}">
+      {%- if feature_image != blank -%}
+        {{
+          feature_image
+          | image_url: width: 1200
+          | image_tag:
+            widths: '480, 720, 960, 1200',
+            sizes: '(min-width: 750px) 40vw, 100vw',
+            loading: 'lazy',
+            alt: '',
+            class: 'botoms-bento__image'
+        }}
+      {%- endif -%}
+      <span class="botoms-bento__overlay">
+        <span class="botoms-bento__eyebrow">{{ section.settings.feature_eyebrow }}</span>
+        <span class="botoms-bento__title">{{ section.settings.feature_title }}</span>
+        <span class="botoms-bento__more">{{ section.settings.feature_link_label }} <span aria-hidden="true">↗</span></span>
+      </span>
+    </a>
+
+    <div class="botoms-bento__tile botoms-bento__tile--statement">
+      <span class="botoms-bento__eyebrow">{{ section.settings.statement_eyebrow }}</span>
+      <p class="botoms-bento__statement">{{ section.settings.statement }}</p>
+    </div>
+
+    <a class="botoms-bento__tile botoms-bento__tile--texture" href="{{ section.settings.texture_link | default: routes.root_url }}">
+      {%- if texture_image != blank -%}
+        {{
+          texture_image
+          | image_url: width: 800
+          | image_tag: widths: '400, 600, 800', sizes: '(min-width: 750px) 25vw, 100vw', loading: 'lazy', alt: '', class: 'botoms-bento__image'
+        }}
+      {%- endif -%}
+      <span class="botoms-bento__overlay">
+        <span class="botoms-bento__eyebrow">{{ section.settings.texture_eyebrow }}</span>
+        <span class="botoms-bento__title">{{ section.settings.texture_title }} <em>{{ section.settings.texture_title_italic }}</em></span>
+        <span class="botoms-bento__more">{{ section.settings.texture_link_label }} <span aria-hidden="true">↗</span></span>
+      </span>
+    </a>
+
+    <div class="botoms-bento__tile botoms-bento__tile--quote">
+      <span class="botoms-bento__eyebrow">{{ section.settings.quote_eyebrow }}</span>
+      <p class="botoms-bento__quote">
+        {{- section.settings.quote }} <em>{{ section.settings.quote_italic }}</em>
+      </p>
+      {%- if section.settings.quote_link_label != blank -%}
+        <a class="botoms-bento__more" href="{{ section.settings.quote_link | default: bento_collection.url }}">
+          {{- section.settings.quote_link_label }} <span aria-hidden="true">↗</span>
+        </a>
+      {%- endif -%}
+    </div>
+  </div>
+</div>
+
+{% stylesheet %}
+  .botoms-bento {
+    padding: var(--bento-padding-top) 16px var(--bento-padding-bottom);
+    background: var(--botoms-ink);
+    color: var(--botoms-cream);
+  }
+
+  .botoms-bento__head {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 24px;
+    align-items: flex-end;
+    justify-content: space-between;
+    margin-bottom: 24px;
+  }
+
+  .botoms-bento__eyebrow {
+    display: block;
+    margin: 0;
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+
+  .botoms-bento__heading {
+    margin: 12px 0 0;
+    font-family: var(--font-body--family);
+    font-size: clamp(2.5rem, 9vw, 4.5rem);
+    font-weight: 400;
+    line-height: 1;
+    letter-spacing: -0.03em;
+    color: var(--botoms-cream);
+  }
+
+  .botoms-bento__heading em,
+  .botoms-bento__title em,
+  .botoms-bento__quote em {
+    font-family: var(--font-heading--family);
+    font-style: italic;
+    font-weight: 400;
+  }
+
+  .botoms-bento__heading em {
+    display: block;
+    color: var(--botoms-pink-cherub);
+  }
+
+  .botoms-bento__link,
+  .botoms-bento__more {
+    color: inherit;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+
+  .botoms-bento__grid {
+    display: grid;
+    gap: 12px;
+  }
+
+  .botoms-bento__tile {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-height: 200px;
+    padding: 22px;
+    overflow: hidden;
+    border-radius: 4px;
+    color: var(--botoms-ink);
+    text-decoration: none;
+  }
+
+  .botoms-bento__tile:focus-visible,
+  .botoms-bento__link:focus-visible,
+  .botoms-bento__more:focus-visible {
+    outline: 2px solid var(--botoms-pink-cherub);
+    outline-offset: 3px;
+  }
+
+  .botoms-bento__image {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s ease;
+  }
+
+  a.botoms-bento__tile:hover .botoms-bento__image {
+    transform: scale(1.03);
+  }
+
+  .botoms-bento__overlay {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: auto;
+  }
+
+  .botoms-bento__tile--feature {
+    min-height: 440px;
+    background: var(--botoms-photo-white);
+    color: var(--botoms-white);
+  }
+
+  .botoms-bento__tile--feature .botoms-bento__overlay {
+    margin: auto -22px -22px;
+    padding: 60px 22px 22px;
+    background: linear-gradient(transparent, rgb(var(--botoms-ink-rgb) / 0.78));
+  }
+
+  .botoms-bento__title {
+    font-size: clamp(1.625rem, 6vw, 2.25rem);
+    line-height: 1.1;
+  }
+
+  .botoms-bento__tile--statement {
+    background: var(--botoms-butterfly);
+  }
+
+  .botoms-bento__statement {
+    margin: auto 0 0;
+    font-family: var(--font-heading--family);
+    font-size: clamp(2.75rem, 10vw, 4rem);
+    line-height: 1;
+    white-space: pre-line;
+  }
+
+  .botoms-bento__tile--texture {
+    background: var(--botoms-pink-cherub);
+  }
+
+  .botoms-bento__tile--quote {
+    min-height: 280px;
+    background: var(--botoms-forest);
+    color: var(--botoms-cream);
+  }
+
+  .botoms-bento__quote {
+    margin: auto 0 12px;
+    font-size: clamp(1.625rem, 6vw, 2.125rem);
+    line-height: 1.2;
+    white-space: pre-line;
+  }
+
+  @media screen and (min-width: 750px) {
+    .botoms-bento {
+      padding-inline: 40px;
+    }
+
+    .botoms-bento__grid {
+      grid-template-columns: 1.2fr 0.8fr 1fr;
+      grid-template-rows: 220px 220px;
+      gap: 16px;
+    }
+
+    .botoms-bento__tile--feature {
+      grid-row: span 2;
+      min-height: 0;
+    }
+
+    .botoms-bento__tile--quote {
+      grid-column: 3;
+      grid-row: 1 / span 2;
+      min-height: 0;
+    }
+
+    .botoms-bento__tile {
+      min-height: 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .botoms-bento__image {
+      transition: none;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Botoms essentials bento",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Less ordinary. More you." },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "A different" },
+    { "type": "text", "id": "heading_italic", "label": "Heading, italic line", "default": "kind of essential." },
+    { "type": "text", "id": "link_label", "label": "Link label", "default": "The Botoms perspective" },
+    { "type": "url", "id": "link", "label": "Link" },
+    { "type": "collection", "id": "collection", "label": "Fallback photos from" },
+    { "type": "header", "content": "Photo tile" },
+    { "type": "image_picker", "id": "feature_image", "label": "Image" },
+    { "type": "text", "id": "feature_eyebrow", "label": "Eyebrow", "default": "01 / The silhouette" },
+    { "type": "text", "id": "feature_title", "label": "Title", "default": "Good shape. Great possibilities." },
+    { "type": "text", "id": "feature_link_label", "label": "Link label", "default": "Find your fit" },
+    { "type": "url", "id": "feature_link", "label": "Link" },
+    { "type": "header", "content": "Statement tile" },
+    { "type": "text", "id": "statement_eyebrow", "label": "Eyebrow", "default": "The wardrobe equation" },
+    { "type": "textarea", "id": "statement", "label": "Statement", "default": "Less.\nBetter." },
+    { "type": "header", "content": "Fabric tile" },
+    { "type": "image_picker", "id": "texture_image", "label": "Image" },
+    { "type": "text", "id": "texture_eyebrow", "label": "Eyebrow", "default": "02 / A softer approach" },
+    { "type": "text", "id": "texture_title", "label": "Title", "default": "Feel the" },
+    { "type": "text", "id": "texture_title_italic", "label": "Title, italic", "default": "difference." },
+    { "type": "text", "id": "texture_link_label", "label": "Link label", "default": "Fabric guide" },
+    { "type": "url", "id": "texture_link", "label": "Link" },
+    { "type": "header", "content": "Quote tile" },
+    { "type": "text", "id": "quote_eyebrow", "label": "Eyebrow", "default": "Made for your everyday" },
+    { "type": "textarea", "id": "quote", "label": "Quote", "default": "For the plans.\nThe no-plans.\nAnd everything" },
+    { "type": "text", "id": "quote_italic", "label": "Quote, italic ending", "default": "in between." },
+    { "type": "text", "id": "quote_link_label", "label": "Link label", "default": "Meet the collection" },
+    { "type": "url", "id": "quote_link", "label": "Link" },
+    { "type": "range", "id": "padding-block-start", "label": "Top padding", "min": 0, "max": 120, "step": 4, "unit": "px", "default": 64 },
+    { "type": "range", "id": "padding-block-end", "label": "Bottom padding", "min": 0, "max": 120, "step": 4, "unit": "px", "default": 64 }
+  ],
+  "presets": [{ "name": "Botoms essentials bento" }]
+}
+{% endschema %}

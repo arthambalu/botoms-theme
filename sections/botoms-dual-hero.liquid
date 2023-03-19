@@ -1,0 +1,400 @@
+{%- comment -%}
+  Home hero: headline beside two columns of real product photos drifting in opposite directions
+  (a living lookbook). Motion pauses on hover, focus or the pause button, and stops for reduced motion.
+  Each column repeats its products once so the loop is seamless; the copies are hidden from assistive tech.
+{%- endcomment -%}
+
+{%- liquid
+  assign hero_collection = section.settings.collection
+  if hero_collection == blank
+    assign hero_collection = collections['shop-all']
+  endif
+  assign hero_products = hero_collection.products | where: 'featured_image' | slice: 0, section.settings.max_products
+  assign reversed_products = hero_products | reverse
+-%}
+
+<div
+  class="botoms-dual"
+  style="--dual-duration: {{ section.settings.duration }}s;"
+  data-paused="false"
+>
+  <div class="botoms-dual__hero">
+    <div class="botoms-dual__copy">
+      {%- if section.settings.eyebrow != blank -%}
+        <p class="botoms-dual__eyebrow">{{ section.settings.eyebrow }}</p>
+      {%- endif -%}
+      <h1 class="botoms-dual__heading">
+        {{- section.settings.heading -}}
+        {%- if section.settings.heading_italic != blank -%}
+          <em>{{ section.settings.heading_italic }}</em>
+        {%- endif -%}
+      </h1>
+      {%- if section.settings.text != blank -%}
+        <p class="botoms-dual__text">{{ section.settings.text }}</p>
+      {%- endif -%}
+      {%- if section.settings.button_label != blank -%}
+        <a class="botoms-dual__button" href="{{ section.settings.button_link | default: hero_collection.url }}">
+          {{- section.settings.button_label }} <span aria-hidden="true">↗</span>
+        </a>
+      {%- endif -%}
+      {%- if section.settings.footnote != blank -%}
+        <p class="botoms-dual__footnote">{{ section.settings.footnote }}</p>
+      {%- endif -%}
+    </div>
+
+    {%- if hero_products.size > 0 -%}
+      <div class="botoms-dual__tracks">
+        {%- for lane in (1..2) -%}
+          {%- liquid
+            if lane == 1
+              assign lane_products = hero_products
+            else
+              assign lane_products = reversed_products
+            endif
+          -%}
+          <div class="botoms-dual__track botoms-dual__track--{{ lane }}">
+            <div class="botoms-dual__lane">
+              {%- for copy in (1..2) -%}
+                {%- for hero_product in lane_products -%}
+                  <a
+                    class="botoms-dual__tile"
+                    href="{{ hero_product.url }}"
+                    {% if copy == 2 %}
+                      aria-hidden="true" tabindex="-1"
+                    {% endif %}
+                  >
+                    {%- liquid
+                      if copy == 1 and lane == 1 and forloop.index < 3
+                        assign tile_loading = 'eager'
+                      else
+                        assign tile_loading = 'lazy'
+                      endif
+                      if copy == 2
+                        assign tile_alt = ''
+                      else
+                        assign tile_alt = hero_product.featured_image.alt | default: hero_product.title
+                      endif
+                    -%}
+                    {{
+                      hero_product.featured_image
+                      | image_url: width: 900
+                      | image_tag:
+                        widths: '360, 540, 720, 900',
+                        sizes: '(min-width: 750px) 30vw, 48vw',
+                        loading: tile_loading,
+                        alt: tile_alt,
+                        class: 'botoms-dual__image'
+                    }}
+                    <span class="botoms-dual__label">
+                      {%- liquid
+                        # Number by position in the collection, so both columns label a product the same way.
+                        if lane == 1
+                          assign tile_position = forloop.index
+                        else
+                          assign tile_position = hero_products.size | minus: forloop.index | plus: 1
+                        endif
+                        assign tile_number = tile_position | prepend: '0' | slice: -2, 2
+                      -%}
+                      {{ tile_number }} / {{ hero_product.title }} <span aria-hidden="true">↗</span>
+                    </span>
+                  </a>
+                {%- endfor -%}
+              {%- endfor -%}
+            </div>
+          </div>
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+  </div>
+
+  <div class="botoms-dual__bar">
+    <span>{{ section.settings.motion_note }}</span>
+    {%- if hero_products.size > 0 -%}
+      <button
+        type="button"
+        class="botoms-dual__pause button-unstyled"
+        aria-pressed="false"
+        data-pause-label="{{ 'botoms.home.pause_motion' | t }}"
+        data-play-label="{{ 'botoms.home.play_motion' | t }}"
+      >
+        {{ 'botoms.home.pause_motion' | t }}
+      </button>
+    {%- endif -%}
+  </div>
+</div>
+
+{% stylesheet %}
+  .botoms-dual {
+    --dual-line: rgb(251 248 244 / 0.16);
+
+    background: var(--botoms-ink);
+    color: var(--botoms-cream);
+  }
+
+  .botoms-dual__hero {
+    display: grid;
+    gap: 28px;
+    padding: calc(var(--header-height, 0px) * var(--transparent-header-offset-boolean, 0) + 52px) 16px 0;
+  }
+
+  .botoms-dual__copy {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .botoms-dual__eyebrow,
+  .botoms-dual__footnote {
+    margin: 0;
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+
+  .botoms-dual__heading {
+    margin: 16px 0 14px;
+    font-family: var(--font-body--family);
+    font-size: clamp(3rem, 13vw, 6.5rem);
+    font-weight: 400;
+    line-height: 0.98;
+    letter-spacing: -0.04em;
+    color: var(--botoms-cream);
+  }
+
+  .botoms-dual__heading em {
+    display: block;
+    font-family: var(--font-heading--family);
+    font-style: italic;
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    color: var(--botoms-pink-cherub);
+  }
+
+  .botoms-dual__text {
+    max-width: 30ch;
+    margin: 0 0 22px;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: rgb(251 248 244 / 0.82);
+  }
+
+  .botoms-dual__button {
+    display: inline-flex;
+    gap: 6px;
+    align-items: center;
+    min-height: 44px;
+    padding: 0 22px;
+    border-radius: 999px;
+    background: var(--botoms-pink-cherub);
+    color: var(--botoms-ink);
+    font-size: 0.9375rem;
+    text-decoration: none;
+  }
+
+  .botoms-dual__button:focus-visible,
+  .botoms-dual__tile:focus-visible,
+  .botoms-dual__pause:focus-visible {
+    outline: 2px solid var(--botoms-pink-cherub);
+    outline-offset: 3px;
+  }
+
+  .botoms-dual__footnote {
+    display: none;
+    margin-top: auto;
+    color: rgb(251 248 244 / 0.7);
+  }
+
+  .botoms-dual__tracks {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    height: 460px;
+    overflow: hidden;
+    mask-image: linear-gradient(transparent, #000 10%, #000 90%, transparent);
+  }
+
+  .botoms-dual__track {
+    overflow: hidden;
+  }
+
+  .botoms-dual__lane {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    animation: botoms-dual-drift var(--dual-duration) linear infinite;
+  }
+
+  /* Opposite direction, started a third of the way in so the columns never line up. */
+  .botoms-dual__track--2 .botoms-dual__lane {
+    animation-direction: reverse;
+    animation-delay: calc(var(--dual-duration) / -3);
+  }
+
+  .botoms-dual[data-paused='true'] .botoms-dual__lane,
+  .botoms-dual__tracks:hover .botoms-dual__lane,
+  .botoms-dual__tracks:focus-within .botoms-dual__lane {
+    animation-play-state: paused;
+  }
+
+  @keyframes botoms-dual-drift {
+    to {
+      transform: translateY(calc(-50% - 5px));
+    }
+  }
+
+  .botoms-dual__tile {
+    position: relative;
+    display: block;
+    flex: 0 0 auto;
+    aspect-ratio: 3 / 4;
+    overflow: hidden;
+    border-radius: 4px;
+    background: var(--botoms-photo-white);
+  }
+
+  .botoms-dual__image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s ease;
+  }
+
+  .botoms-dual__tile:hover .botoms-dual__image {
+    transform: scale(1.04);
+  }
+
+  .botoms-dual__label {
+    position: absolute;
+    left: 8px;
+    bottom: 8px;
+    max-width: calc(100% - 16px);
+    padding: 4px 10px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: rgb(251 248 244 / 0.92);
+    color: var(--botoms-ink);
+    font-size: 11px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .botoms-dual__bar {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px;
+    border-bottom: 1px solid var(--dual-line);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .botoms-dual__pause {
+    flex-shrink: 0;
+    min-height: 32px;
+    white-space: nowrap;
+    color: var(--botoms-cream);
+    font-size: 12px;
+    letter-spacing: 0;
+    text-transform: none;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    cursor: pointer;
+  }
+
+  @media screen and (min-width: 750px) {
+    .botoms-dual__hero {
+      grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+      gap: 48px;
+      padding-inline: 40px;
+    }
+
+    .botoms-dual__copy {
+      padding-block: 48px 32px;
+    }
+
+    .botoms-dual__footnote {
+      display: block;
+    }
+
+    .botoms-dual__tracks {
+      height: clamp(560px, 78vh, 720px);
+      gap: 14px;
+    }
+
+    .botoms-dual__lane {
+      gap: 14px;
+    }
+
+    .botoms-dual__tile {
+      aspect-ratio: 1;
+    }
+
+    @keyframes botoms-dual-drift {
+      to {
+        transform: translateY(calc(-50% - 7px));
+      }
+    }
+
+    .botoms-dual__bar {
+      padding-inline: 40px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .botoms-dual__lane {
+      animation: none;
+    }
+
+    .botoms-dual__tile[aria-hidden='true'] {
+      display: none;
+    }
+
+    .botoms-dual__tracks {
+      overflow-y: auto;
+      mask-image: none;
+    }
+
+    .botoms-dual__pause {
+      display: none;
+    }
+
+    .botoms-dual__image {
+      transition: none;
+    }
+  }
+{% endstylesheet %}
+
+{% javascript %}
+  document.addEventListener('click', (event) => {
+    const button = event.target instanceof Element ? event.target.closest('.botoms-dual__pause') : null;
+    if (!button) return;
+    const hero = button.closest('.botoms-dual');
+    const paused = hero.dataset.paused !== 'true';
+    hero.dataset.paused = String(paused);
+    button.setAttribute('aria-pressed', String(paused));
+    button.textContent = paused ? button.dataset.playLabel : button.dataset.pauseLabel;
+  });
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "Botoms dual hero",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Botoms / in motion" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Life moves." },
+    { "type": "text", "id": "heading_italic", "label": "Heading, italic line", "default": "Move with it." },
+    { "type": "text", "id": "text", "label": "Text", "default": "Leggings and bottomwear that keep up with your day. Find your own rhythm." },
+    { "type": "text", "id": "button_label", "label": "Button label", "default": "Explore the edit" },
+    { "type": "url", "id": "button_link", "label": "Button link" },
+    { "type": "text", "id": "footnote", "label": "Footnote", "default": "Two columns / one wardrobe" },
+    { "type": "collection", "id": "collection", "label": "Products in the columns" },
+    { "type": "range", "id": "max_products", "label": "Products per column", "min": 3, "max": 12, "step": 1, "default": 8 },
+    { "type": "range", "id": "duration", "label": "Loop length", "min": 20, "max": 120, "step": 5, "unit": "s", "default": 50 },
+    { "type": "text", "id": "motion_note", "label": "Note under the columns", "default": "A living lookbook · tap a look to shop" }
+  ],
+  "presets": [{ "name": "Botoms dual hero" }]
+}
+{% endschema %}
