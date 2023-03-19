@@ -76,6 +76,41 @@
       background-color: var(--botoms-ink);
     }
 
+    /* Footer stays dark on home; the pink newsletter card and popovers keep their own colours. */
+    .shopify-section.shopify-section-group-footer-group:not(.header-section) .section-background {
+      --color-background: var(--botoms-ink);
+
+      background-color: var(--botoms-ink);
+    }
+
+    .shopify-section-group-footer-group .section.section--page-width {
+      --color-foreground: var(--botoms-cream);
+      --color-foreground-rgb: 251 248 244;
+      --color-border: rgb(251 248 244 / 0.16);
+      --color-border-rgb: 251 248 244;
+
+      color: var(--botoms-cream);
+    }
+
+    .shopify-section-group-footer-group .section.section--page-width :is(p, a, li, span, summary, button, h2, h3):not(.email-signup__button) {
+      color: inherit;
+    }
+
+    /* Copyright and policy blocks set --color-utilities inline from their settings, so set the colour itself. */
+    .shopify-section-group-footer-group .utilities :is(.footer-utilities__group-copyright, a, button) {
+      color: rgb(251 248 244 / 0.75);
+    }
+
+    /* The policy trigger's colour comes from an inline typography style. */
+    .shopify-section-group-footer-group .utilities .policy-list-trigger {
+      /* stylelint-disable-next-line declaration-no-important */
+      color: rgb(251 248 244 / 0.75) !important;
+    }
+
+    .shopify-section-group-footer-group .group-block:has(.email-signup__input) {
+      color: var(--botoms-ink);
+    }
+
     main [ref='priceContainer'] .compare-at-price ~ .price,
     main [ref='priceContainer'] .price:has(~ .compare-at-price) {
       color: var(--botoms-pink-cherub);

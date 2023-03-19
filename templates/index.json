@@ -22,7 +22,11 @@
         "collection": "shop-all",
         "max_products": 8,
         "duration": 50,
-        "motion_note": "A living lookbook · tap a look to shop"
+        "motion_note": "A living lookbook · tap a look to shop",
+        "size_link_label": "Find my size",
+        "size_link": "shopify://pages/size-guide",
+        "show_colours": true,
+        "colours_heading": "Shop by colour"
       }
     },
     "product_list_fa6P9H": {

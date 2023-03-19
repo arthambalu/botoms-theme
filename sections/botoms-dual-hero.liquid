@@ -32,11 +32,57 @@
       {%- if section.settings.text != blank -%}
         <p class="botoms-dual__text">{{ section.settings.text }}</p>
       {%- endif -%}
-      {%- if section.settings.button_label != blank -%}
-        <a class="botoms-dual__button" href="{{ section.settings.button_link | default: hero_collection.url }}">
-          {{- section.settings.button_label }} <span aria-hidden="true">↗</span>
-        </a>
+      <div class="botoms-dual__actions">
+        {%- if section.settings.button_label != blank -%}
+          <a class="botoms-dual__button" href="{{ section.settings.button_link | default: hero_collection.url }}">
+            {{- section.settings.button_label }} <span aria-hidden="true">↗</span>
+          </a>
+        {%- endif -%}
+        {%- if section.settings.size_link_label != blank and section.settings.size_link != blank -%}
+          <a class="botoms-dual__size-link" href="{{ section.settings.size_link }}">
+            {%- render 'botoms-icon', name: 'ruler', size: 18 -%}
+            {{ section.settings.size_link_label }}
+          </a>
+        {%- endif -%}
+      </div>
+
+      {%- if section.settings.show_colours -%}
+        {%- liquid
+          # Colours actually used by the collection's products, so a chip never opens an empty filter.
+          assign colour_list = '|'
+          for colour_product in hero_collection.products
+            assign colour_option = colour_product.options_by_name['Color'] | default: colour_product.options_by_name['Colour']
+            for colour_value in colour_option.values
+              assign colour_key = '|' | append: colour_value.name | append: '|'
+              unless colour_list contains colour_key
+                assign colour_list = colour_list | append: colour_value.name | append: '|'
+              endunless
+            endfor
+          endfor
+          assign colour_names = colour_list | split: '|' | compact
+        -%}
+        {%- if colour_names.size > 0 -%}
+          <div class="botoms-dual__colours">
+            <p class="botoms-dual__eyebrow">{{ section.settings.colours_heading }}</p>
+            <ul class="botoms-dual__chips" role="list">
+              {%- for colour_name in colour_names limit: 8 -%}
+                {%- if colour_name != blank -%}
+                  <li>
+                    <a
+                      class="botoms-dual__chip"
+                      href="{{ hero_collection.url }}?filter.v.option.color={{ colour_name | url_encode }}"
+                    >
+                      {%- render 'botoms-filter-swatch', name: colour_name -%}
+                      {{ colour_name }}
+                    </a>
+                  </li>
+                {%- endif -%}
+              {%- endfor -%}
+            </ul>
+          </div>
+        {%- endif -%}
       {%- endif -%}
+
       {%- if section.settings.footnote != blank -%}
         <p class="botoms-dual__footnote">{{ section.settings.footnote }}</p>
       {%- endif -%}
@@ -176,6 +222,77 @@
     font-size: 1rem;
     line-height: 1.5;
     color: rgb(251 248 244 / 0.82);
+  }
+
+  .botoms-dual__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 20px;
+    align-items: center;
+  }
+
+  .botoms-dual__size-link {
+    display: inline-flex;
+    gap: 8px;
+    align-items: center;
+    min-height: 44px;
+    color: var(--botoms-cream);
+    font-size: 0.9375rem;
+    text-decoration: underline;
+    text-underline-offset: 5px;
+  }
+
+  .botoms-dual__colours {
+    width: 100%;
+    max-width: 420px;
+    margin-top: 24px;
+    padding-top: 18px;
+    border-top: 1px solid var(--dual-line);
+  }
+
+  .botoms-dual__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 12px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .botoms-dual__chip {
+    display: inline-flex;
+    gap: 8px;
+    align-items: center;
+    min-height: 40px;
+    padding: 0 14px 0 10px;
+    border: 1px solid rgb(251 248 244 / 0.35);
+    border-radius: 999px;
+    color: var(--botoms-cream);
+    font-size: 0.875rem;
+    text-decoration: none;
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+
+  .botoms-dual__chip:hover {
+    background-color: var(--botoms-cream);
+    color: var(--botoms-ink);
+  }
+
+  .botoms-dual__chip .swatch {
+    --swatch-width: 16px;
+    --swatch-height: 16px;
+
+    flex: 0 0 auto;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    box-shadow: 0 0 0 1px rgb(251 248 244 / 0.5);
+  }
+
+  .botoms-dual__size-link:focus-visible,
+  .botoms-dual__chip:focus-visible {
+    outline: 2px solid var(--botoms-pink-cherub);
+    outline-offset: 3px;
   }
 
   .botoms-dual__button {
@@ -389,6 +506,10 @@
     { "type": "text", "id": "text", "label": "Text", "default": "Leggings and bottomwear that keep up with your day. Find your own rhythm." },
     { "type": "text", "id": "button_label", "label": "Button label", "default": "Explore the edit" },
     { "type": "url", "id": "button_link", "label": "Button link" },
+    { "type": "text", "id": "size_link_label", "label": "Size link label", "default": "Find my size" },
+    { "type": "url", "id": "size_link", "label": "Size link" },
+    { "type": "checkbox", "id": "show_colours", "label": "Show colour chips", "info": "Colours used by products in the chosen collection; each opens that colour's filter.", "default": true },
+    { "type": "text", "id": "colours_heading", "label": "Colour chips heading", "default": "Shop by colour" },
     { "type": "text", "id": "footnote", "label": "Footnote", "default": "Two columns / one wardrobe" },
     { "type": "collection", "id": "collection", "label": "Products in the columns" },
     { "type": "range", "id": "max_products", "label": "Products per column", "min": 3, "max": 12, "step": 1, "default": 8 },
