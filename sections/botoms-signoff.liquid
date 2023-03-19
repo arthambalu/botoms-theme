@@ -34,8 +34,8 @@
 
 {% stylesheet %}
   .botoms-signoff {
-    background: var(--botoms-forest);
-    color: var(--botoms-cream);
+    background: var(--botoms-pink-cherub);
+    color: var(--botoms-ink);
   }
 
   .botoms-signoff__strip {
@@ -45,8 +45,8 @@
     justify-content: space-between;
     margin: 0;
     padding: 20px 16px;
-    border-block: 1px solid rgb(251 248 244 / 0.16);
-    background: var(--botoms-ink);
+    border-block: 1px solid rgb(var(--botoms-ink-rgb) / 0.12);
+    background: var(--botoms-cream);
     font-size: 12px;
     list-style: none;
   }
@@ -99,7 +99,7 @@
   }
 
   .botoms-signoff__link:focus-visible {
-    outline: 2px solid var(--botoms-pink-cherub);
+    outline: 2px solid var(--botoms-ink);
     outline-offset: 3px;
   }
 

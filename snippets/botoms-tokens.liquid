@@ -46,9 +46,9 @@
   }
 
   {% if template.name == 'index' %}
-    /* Home header: a dark full-width bar with light logo, links and icons and a hairline (sample 2), instead of the pill.
-       The header is transparent on home; these keep it dark when it sticks on scroll-up or a menu link is hovered. */
-    #header-component.header[transparent] {
+    /* Home header over the dark hero: a dark full-width bar with light logo, links and icons and a hairline.
+       Once it sticks on scroll-up it falls back to the cream pill used on every other page. */
+    #header-component.header[transparent]:not([data-sticky-state='active']) {
       --header-logo-display: none;
       --header-logo-inverse-display: block;
       --color-foreground: var(--botoms-cream);
@@ -57,11 +57,12 @@
       --color-transparent-text-rgb: 251 248 244;
     }
 
-    #header-component.header[transparent] .header__underlay {
+    /* Horizon shows its underlay while a menu link is hovered; keep it dark over the hero. */
+    #header-component.header[transparent]:not([data-sticky-state='active']) .header__underlay {
       background-color: var(--botoms-ink);
     }
 
-    #header-component.header .header__row--top {
+    #header-component.header:not([data-sticky-state='active']) .header__row--top {
       width: auto;
       margin: 0;
       border-radius: 0;
@@ -69,58 +70,18 @@
       box-shadow: none;
     }
 
-    /* Home is dark end to end (Botoms dual hero design). */
-    /* Horizon paints section colours on a .section-background layer above the section itself. */
+    /* Announcement band dark above the hero. Horizon paints section colours on a .section-background layer. */
     #header-group > .shopify-section:not(.header-section),
     #header-group > .shopify-section:not(.header-section) .section-background {
       background-color: var(--botoms-ink);
     }
 
-    /* Footer stays dark on home; the pink newsletter card and popovers keep their own colours. */
-    .shopify-section.shopify-section-group-footer-group:not(.header-section) .section-background {
-      --color-background: var(--botoms-ink);
-
-      background-color: var(--botoms-ink);
-    }
-
-    .shopify-section-group-footer-group .section.section--page-width {
-      --color-foreground: var(--botoms-cream);
-      --color-foreground-rgb: 251 248 244;
-      --color-border: rgb(251 248 244 / 0.16);
-      --color-border-rgb: 251 248 244;
-
-      color: var(--botoms-cream);
-    }
-
-    .shopify-section-group-footer-group .section.section--page-width :is(p, a, li, span, summary, button, h2, h3):not(.email-signup__button) {
-      color: inherit;
-    }
-
-    /* Copyright and policy blocks set --color-utilities inline from their settings, so set the colour itself. */
-    .shopify-section-group-footer-group .utilities :is(.footer-utilities__group-copyright, a, button) {
-      color: rgb(251 248 244 / 0.75);
-    }
-
-    /* The policy trigger's colour comes from an inline typography style. */
-    .shopify-section-group-footer-group .utilities .policy-list-trigger {
-      /* stylelint-disable-next-line declaration-no-important */
-      color: rgb(251 248 244 / 0.75) !important;
-    }
-
-    .shopify-section-group-footer-group .group-block:has(.email-signup__input) {
-      color: var(--botoms-ink);
-    }
-
-    main [ref='priceContainer'] .compare-at-price ~ .price,
-    main [ref='priceContainer'] .price:has(~ .compare-at-price) {
-      color: var(--botoms-pink-cherub);
-    }
-
+    /* Below the hero the page is light: italic heading words in Rose for contrast on cream. */
     main h2 em {
       font-family: var(--font-heading--family);
       font-style: italic;
       font-weight: 400;
-      color: var(--botoms-pink-cherub);
+      color: var(--botoms-rose);
     }
 
     /* Horizon text blocks on home: small eyebrow paragraph, sans heading with an italic serif word. */
