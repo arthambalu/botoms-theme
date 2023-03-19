@@ -16,9 +16,15 @@
       "shop_now": "Shop now",
       "explore": "Explore",
       "position": "{{ index }} of {{ count }}: {{ title }}",
-      "styles_count": "{{ count }} styles",
+      "styles_count": {
+        "one": "{{ count }} style",
+        "other": "{{ count }} styles"
+      },
       "colours": "Colours",
       "colour_option": "{{ colour }}"
+    },
+    "fabric_story": {
+      "shop": "Shop {{ fabric }}"
     }
   },
   "accessibility": {

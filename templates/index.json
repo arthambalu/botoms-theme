@@ -115,8 +115,8 @@
                 "width": "fit-content",
                 "max_width": "normal",
                 "alignment": "left",
-                "type_preset": "h4",
-                "font": "var(--font-body--family)",
+                "type_preset": "h3",
+                "font": "var(--font-heading--family)",
                 "font_size": "",
                 "line_height": "normal",
                 "letter_spacing": "normal",
@@ -172,7 +172,7 @@
               "type": "_product-card-gallery",
               "name": "t:names.product_card_media",
               "settings": {
-                "image_ratio": "adapt",
+                "image_ratio": "portrait",
                 "border": "none",
                 "border_width": 1,
                 "border_opacity": 100,
@@ -240,9 +240,9 @@
       },
       "name": "t:names.featured_collection",
       "settings": {
-        "collection": "all",
+        "collection": "new-arrivals",
         "layout_type": "grid",
-        "carousel_on_mobile": false,
+        "carousel_on_mobile": true,
         "max_products": 8,
         "columns": 4,
         "mobile_columns": "2",
@@ -254,6 +254,28 @@
         "section_width": "page-width",
         "horizontal_alignment": "flex-start",
         "gap": 28,
+        "padding-block-start": 32,
+        "padding-block-end": 48
+      }
+    },
+    "botoms_type_tiles": {
+      "type": "botoms-type-tiles",
+      "settings": {
+        "heading": "Shop by type",
+        "collections": [
+          "leggings",
+          "kurti-pants",
+          "palazzo-wide-leg"
+        ],
+        "padding-block-start": 32,
+        "padding-block-end": 16
+      }
+    },
+    "botoms_fabric_story": {
+      "type": "botoms-fabric-story",
+      "settings": {
+        "heading": "Know your fabric",
+        "text": "<p>Every Botoms piece starts with the fabric. Here is what each one feels like, so you can choose for your day.</p>",
         "padding-block-start": 48,
         "padding-block-end": 48
       }
@@ -261,6 +283,8 @@
   },
   "order": [
     "botoms_card_switcher",
-    "product_list_fa6P9H"
+    "botoms_type_tiles",
+    "product_list_fa6P9H",
+    "botoms_fabric_story"
   ]
 }
