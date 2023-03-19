@@ -45,29 +45,34 @@
     color: var(--botoms-ink);
   }
 
-  /* Transparent header (home): keep the white pill and the dark logo over the dark hero. */
-  #header-component.header[transparent] {
-    --header-logo-display: block;
-    --header-logo-inverse-display: none;
-  }
-
-  /* Horizon forces header rows transparent and collapses its underlay here, so paint the pill behind the row. */
-  #header-component.header[transparent] .header__row--top {
-    isolation: isolate;
-  }
-
-  #header-component.header[transparent] .header__row--top::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    border-radius: inherit;
-    background-color: var(--botoms-cream);
-  }
-
   {% if template.name == 'index' %}
+    /* Home header: a dark full-width bar with light logo, links and icons and a hairline (sample 2), instead of the pill.
+       The header is transparent on home; these keep it dark when it sticks on scroll-up or a menu link is hovered. */
+    #header-component.header[transparent] {
+      --header-logo-display: none;
+      --header-logo-inverse-display: block;
+      --color-foreground: var(--botoms-cream);
+      --color-foreground-rgb: 251 248 244;
+      --color-transparent-text: var(--botoms-cream);
+      --color-transparent-text-rgb: 251 248 244;
+    }
+
+    #header-component.header[transparent] .header__underlay {
+      background-color: var(--botoms-ink);
+    }
+
+    #header-component.header .header__row--top {
+      width: auto;
+      margin: 0;
+      border-radius: 0;
+      border-bottom: 1px solid rgb(251 248 244 / 0.16);
+      box-shadow: none;
+    }
+
     /* Home is dark end to end (Botoms dual hero design). */
-    #header-group > .shopify-section:not(.header-section) {
+    /* Horizon paints section colours on a .section-background layer above the section itself. */
+    #header-group > .shopify-section:not(.header-section),
+    #header-group > .shopify-section:not(.header-section) .section-background {
       background-color: var(--botoms-ink);
     }
 
