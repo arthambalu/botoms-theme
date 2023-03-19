@@ -185,12 +185,28 @@
     display: none;
   }
 
-  @media screen and (max-width: 749px) {
-    /* Phones: the colour pill and a labelled button don't both fit on a half-width card. */
+  /* The card decides by its own width, not the screen's: narrow cards get the round bag icon and a longer
+     colour pill; wide cards get the "Choose size" label and a pill that stops short of it. The swatch list
+     folds whatever doesn't fit into "+N", so the two never meet. */
+  .product-card__content {
+    container: botoms-card / inline-size;
+  }
+
+  product-card button.quick-add__button--choose {
+    width: var(--quick-add-collapsed-width);
+    padding: 0;
+    font-size: 0;
+  }
+
+  @container botoms-card (min-width: 300px) {
     product-card button.quick-add__button--choose {
-      width: var(--quick-add-collapsed-width);
-      padding: 0;
-      font-size: 0;
+      width: auto;
+      padding-inline: 2px 14px;
+      font-size: 0.8125rem;
+    }
+
+    .product-card__content > product-swatches {
+      max-width: calc(100% - 160px);
     }
   }
 
