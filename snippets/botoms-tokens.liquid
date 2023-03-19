@@ -1,0 +1,38 @@
+{%- doc -%}
+  Botoms brand tokens and the few brand styles Horizon has no setting for.
+  Values come from brand/brand.md. Palette, fonts, buttons, inputs and swatches live in theme settings.
+
+  @example
+  {% render 'botoms-tokens' %}
+{%- enddoc -%}
+
+{% style %}
+  :root {
+    --botoms-pink-cherub: #FDBCC6;
+    --botoms-butterfly: #D1E2AE;
+    --botoms-tomatillo: #C6E49A;
+    --botoms-ink: #24301F;
+    --botoms-muted-ink: #5B6655;
+    --botoms-forest: #2F4A2B;
+    --botoms-rose: #A8355A;
+    --botoms-cream: #FBF8F4;
+    --botoms-photo-white: #F5F3F0;
+    --botoms-line: #E6E1DA;
+    --botoms-control: #7D8778;
+  }
+
+  ::selection {
+    background-color: var(--botoms-pink-cherub);
+    color: var(--botoms-ink);
+  }
+
+  .card-gallery,
+  .product-media-container {
+    background-color: var(--botoms-photo-white);
+  }
+
+  [ref='priceContainer'] .compare-at-price ~ .price,
+  [ref='priceContainer'] .price:has(~ .compare-at-price) {
+    color: var(--botoms-rose);
+  }
+{% endstyle %}
