@@ -98,7 +98,7 @@
     "product_corner_radius": 4,
     "card_corner_radius": 4,
     "card_title_case": "default",
-    "show_variant_image": true,
+    "show_variant_image": false,
     "variant_swatch_width": 28,
     "variant_swatch_height": 28,
     "variant_swatch_radius": 100,
