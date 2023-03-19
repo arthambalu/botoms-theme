@@ -40,7 +40,8 @@
         "padding-block-start": 8,
         "padding-block-end": 0,
         "divider_color": "{{ settings.color_palette.color3 }}"
-      }
+      },
+      "disabled": true
     },
     "header_section": {
       "type": "header",
@@ -104,8 +105,8 @@
         "enable_transparent_header_home": true,
         "enable_transparent_header_product": false,
         "enable_transparent_header_collection": false,
-        "home_inverse_logo": true,
-        "text_color_transparent_home": "#FBF8F4"
+        "home_inverse_logo": false,
+        "text_color_transparent_home": "#24301F"
       }
     }
   },

@@ -46,34 +46,24 @@
   }
 
   {% if template.name == 'index' %}
-    /* Home header over the dark hero: a dark full-width bar with light logo, links and icons and a hairline.
-       Once it sticks on scroll-up it falls back to the cream pill used on every other page. */
-    #header-component.header[transparent]:not([data-sticky-state='active']) {
-      --header-logo-display: none;
-      --header-logo-inverse-display: block;
-      --color-foreground: var(--botoms-cream);
-      --color-foreground-rgb: 251 248 244;
-      --color-transparent-text: var(--botoms-cream);
-      --color-transparent-text-rgb: 251 248 244;
+    /* Home: the header floats over the dark hero as the same cream pill used on every page. Horizon clears
+       header rows and swaps to the inverse logo in transparent mode, so paint the pill and keep the dark logo. */
+    #header-component.header[transparent] {
+      --header-logo-display: block;
+      --header-logo-inverse-display: none;
     }
 
-    /* Horizon shows its underlay while a menu link is hovered; keep it dark over the hero. */
-    #header-component.header[transparent]:not([data-sticky-state='active']) .header__underlay {
-      background-color: var(--botoms-ink);
+    #header-component.header[transparent] .header__row--top {
+      isolation: isolate;
     }
 
-    #header-component.header:not([data-sticky-state='active']) .header__row--top {
-      width: auto;
-      margin: 0;
-      border-radius: 0;
-      border-bottom: 1px solid rgb(251 248 244 / 0.16);
-      box-shadow: none;
-    }
-
-    /* Announcement band dark above the hero. Horizon paints section colours on a .section-background layer. */
-    #header-group > .shopify-section:not(.header-section),
-    #header-group > .shopify-section:not(.header-section) .section-background {
-      background-color: var(--botoms-ink);
+    #header-component.header[transparent] .header__row--top::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      border-radius: inherit;
+      background-color: var(--botoms-cream);
     }
 
     /* Below the hero the page is light: italic heading words in Rose for contrast on cream. */
@@ -143,6 +133,43 @@
 
   button.shopify-payment-button__button--unbranded:hover {
     --button-background-color: var(--botoms-white);
+  }
+
+  /* Footer (all pages): brand column, eyebrow menu headings, full-width wordmark. */
+  .footer-content > jumbo-text {
+    grid-column: 1 / -1;
+    margin-top: 16px;
+  }
+
+  .footer-content .menu__heading__default {
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+
+  .footer-content .menu__item a:hover {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+
+  .footer-content h2 em {
+    font-family: var(--font-heading--family);
+    font-style: italic;
+    color: var(--botoms-rose);
+  }
+
+  @media screen and (max-width: 749px) {
+    /* Mobile header: the logo, account, wishlist and bag must fit one row without touching. */
+    #header-component .header-logo__image {
+      height: 20px;
+      width: auto;
+    }
+  }
+
+  @media screen and (max-width: 379px) {
+    #header-component .header-logo__image {
+      height: 17px;
+    }
   }
 
   .footer-utilities .policy-list-trigger {
