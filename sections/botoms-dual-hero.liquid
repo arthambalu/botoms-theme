@@ -59,7 +59,7 @@
               endunless
             endfor
           endfor
-          assign colour_names = colour_list | split: '|' | compact
+          assign colour_names = colour_list | remove_first: '|' | split: '|'
         -%}
         {%- if colour_names.size > 0 -%}
           <div class="botoms-dual__colours">
