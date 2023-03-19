@@ -1,0 +1,5 @@
+# Botoms sells in English only. New Botoms strings live in locales/en.default.json
+# (under "botoms"); Shopify falls back to English for other languages, so copying
+# them into Horizon's 50+ locale files would only create merge conflicts on Horizon updates.
+MatchingTranslations:
+  enabled: false

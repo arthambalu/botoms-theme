@@ -1,0 +1,163 @@
+{%- doc -%}
+  Resolves one Botoms card switcher block (a product in a chosen colour, or a collection)
+  and renders either its photo card or its caption panel.
+
+  @param {object} block - The card block from the botoms-card-switcher section
+  @param {string} part - 'card' or 'panel'
+  @param {number} index - Position of the block in the section, starting at 0
+  @param {boolean} [is_clone] - Loop copy of a card: hidden from assistive tech and the tab order
+  @param {boolean} [eager] - Load the image eagerly
+  @param {boolean} [priority] - Give the image high fetch priority
+
+  @example
+  {% render 'botoms-switcher-item', block: block, part: 'card', index: forloop.index0 %}
+{%- enddoc -%}
+
+{%- liquid
+  assign card_product = block.settings.product
+  assign card_collection = block.settings.collection
+  assign colour = block.settings.colour | strip
+  assign image = block.settings.image
+  assign card_variant = blank
+  assign url = blank
+  assign title = blank
+  assign subtitle = blank
+
+  if card_product != blank
+    assign card_variant = card_product.selected_or_first_available_variant
+    if colour != blank
+      for candidate in card_product.variants
+        if candidate.options contains colour
+          assign card_variant = candidate
+          break
+        endif
+      endfor
+    endif
+    if image == blank
+      assign image = card_variant.featured_image | default: card_product.featured_image
+    endif
+    assign url = card_variant.url
+    assign title = card_product.title
+    assign subtitle = colour
+  elsif card_collection != blank
+    if image == blank
+      assign image = card_collection.featured_image
+    endif
+    assign url = card_collection.url
+    assign title = card_collection.title
+    assign subtitle = 'botoms.card_switcher.styles_count' | t: count: card_collection.products_count
+  endif
+
+  if block.settings.label != blank
+    assign title = block.settings.label
+  endif
+
+  if eager
+    assign loading = 'eager'
+  else
+    assign loading = 'lazy'
+  endif
+  if priority
+    assign fetch_priority = 'high'
+  else
+    assign fetch_priority = 'auto'
+  endif
+-%}
+
+{%- if part == 'card' -%}
+  <a
+    class="botoms-switcher__card"
+    href="{{ url | default: '#' }}"
+    data-card
+    data-index="{{ index }}"
+    draggable="false"
+    {% if is_clone %}
+      aria-hidden="true" tabindex="-1"
+    {% else %}
+      aria-label="{{ title | escape }}{% if subtitle != blank %}, {{ subtitle | escape }}{% endif %}"
+      {{ block.shopify_attributes }}
+    {% endif %}
+  >
+    <span class="botoms-switcher__frame">
+      {%- if image != blank -%}
+        {{
+          image
+          | image_url: width: 900
+          | image_tag:
+            widths: '360, 540, 720, 900',
+            sizes: '(min-width: 750px) 400px, 72vw',
+            loading: loading,
+            fetchpriority: fetch_priority,
+            alt: '',
+            draggable: 'false',
+            class: 'botoms-switcher__image'
+        }}
+      {%- else -%}
+        {{ 'product-apparel-1' | placeholder_svg_tag: 'botoms-switcher__image' }}
+      {%- endif -%}
+    </span>
+  </a>
+{%- else -%}
+  <div class="botoms-switcher__panel" data-panel="{{ index }}" {% unless index == 0 %}hidden{% endunless %}>
+    <p class="botoms-switcher__title">{{ title }}</p>
+    <p class="botoms-switcher__meta">
+      {%- if subtitle != blank -%}
+        <span>{{ subtitle }}</span>
+      {%- endif -%}
+      {%- if card_variant != blank -%}
+        <span class="botoms-switcher__price">
+          {%- if card_variant.compare_at_price > card_variant.price -%}
+            <span class="botoms-switcher__price--sale">{{ card_variant.price | money }}</span>
+            <s class="botoms-switcher__price--was">{{ card_variant.compare_at_price | money }}</s>
+          {%- else -%}
+            {{ card_variant.price | money }}
+          {%- endif -%}
+        </span>
+      {%- endif -%}
+    </p>
+
+    {%- if card_product != blank -%}
+      {%- for option in card_product.options_with_values -%}
+        {%- assign option_name = option.name | downcase -%}
+        {%- if option_name == 'color' or option_name == 'colour' -%}
+          <ul class="botoms-switcher__colours" aria-label="{{ 'botoms.card_switcher.colours' | t }}">
+            {%- for value in option.values -%}
+              {%- assign swatch_variant = blank -%}
+              {%- for candidate in card_product.variants -%}
+                {%- if candidate.options contains value.name -%}
+                  {%- assign swatch_variant = candidate -%}
+                  {%- break -%}
+                {%- endif -%}
+              {%- endfor -%}
+              {%- assign swatch_image = swatch_variant.featured_image | default: card_product.featured_image -%}
+              <li>
+                <a
+                  class="botoms-switcher__colour"
+                  href="{{ swatch_variant.url }}"
+                  aria-label="{{ 'botoms.card_switcher.colour_option' | t: colour: value.name | escape }}"
+                  {% if card_variant.options contains value.name %}
+                    aria-current="true"
+                  {% endif %}
+                >
+                  {%- if swatch_image != blank -%}
+                    {{ swatch_image | image_url: width: 96, height: 96, crop: 'center' | image_tag: alt: '', loading: 'lazy' }}
+                  {%- endif -%}
+                </a>
+              </li>
+            {%- endfor -%}
+          </ul>
+        {%- endif -%}
+      {%- endfor -%}
+    {%- endif -%}
+
+    {%- if url != blank -%}
+      <a class="button botoms-switcher__cta" href="{{ url }}">
+        {%- if card_product != blank -%}
+          {{ 'botoms.card_switcher.shop_now' | t }}
+        {%- else -%}
+          {{ 'botoms.card_switcher.explore' | t }}
+        {%- endif -%}
+      </a>
+    {%- endif -%}
+  </div>
+{%- endif -%}

@@ -8,6 +8,19 @@
  * ------------------------------------------------------------
  */
 {
+  "botoms": {
+    "card_switcher": {
+      "label": "Featured styles",
+      "previous": "Previous style",
+      "next": "Next style",
+      "shop_now": "Shop now",
+      "explore": "Explore",
+      "position": "{{ index }} of {{ count }}: {{ title }}",
+      "styles_count": "{{ count }} styles",
+      "colours": "Colours",
+      "colour_option": "{{ colour }}"
+    }
+  },
   "accessibility": {
     "account": "Account",
     "active_filters": "Active filters:",

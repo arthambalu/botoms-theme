@@ -1,0 +1,634 @@
+{%- liquid
+  assign count = section.blocks.size
+  assign copies = 1
+  if count > 2
+    assign copies = 3
+  endif
+
+  assign region_label = section.settings.heading | strip_html
+  if region_label == blank
+    assign region_label = 'botoms.card_switcher.label' | t
+  endif
+-%}
+
+<botoms-card-switcher
+  class="botoms-switcher"
+  data-count="{{ count }}"
+  data-position-label="{{ 'botoms.card_switcher.position' | t: index: '[index]', count: '[count]', title: '[title]' | escape }}"
+  style="--switcher-padding-top: {{ section.settings.padding-block-start }}px; --switcher-padding-bottom: {{ section.settings.padding-block-end }}px;"
+>
+  <section
+    class="botoms-switcher__inner"
+    aria-roledescription="carousel"
+    aria-label="{{ region_label | escape }}"
+  >
+    {%- if section.settings.heading != blank -%}
+      <h2 class="botoms-switcher__heading">{{ section.settings.heading }}</h2>
+    {%- endif -%}
+
+    {%- if count > 0 -%}
+      <div class="botoms-switcher__track{% if copies == 1 %} botoms-switcher__track--static{% endif %}" data-track>
+        {%- for copy in (1..copies) -%}
+          {%- assign is_clone = false -%}
+          {%- if copies == 3 and copy != 2 -%}
+            {%- assign is_clone = true -%}
+          {%- endif -%}
+          {%- for block in section.blocks -%}
+            {%- liquid
+              assign eager = false
+              assign priority = false
+              unless is_clone
+                if forloop.index0 < 3
+                  assign eager = true
+                endif
+                if forloop.first
+                  assign priority = true
+                endif
+              endunless
+            -%}
+            {%- render 'botoms-switcher-item',
+              block: block,
+              part: 'card',
+              index: forloop.index0,
+              is_clone: is_clone,
+              eager: eager,
+              priority: priority
+            -%}
+          {%- endfor -%}
+        {%- endfor -%}
+      </div>
+
+      <div class="botoms-switcher__caption">
+        <button
+          type="button"
+          class="botoms-switcher__arrow"
+          data-prev
+          aria-label="{{ 'botoms.card_switcher.previous' | t }}"
+        >
+          <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" width="20" height="20"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="botoms-switcher__panels">
+          {%- for block in section.blocks -%}
+            {%- render 'botoms-switcher-item', block: block, part: 'panel', index: forloop.index0 -%}
+          {%- endfor -%}
+        </div>
+        <button
+          type="button"
+          class="botoms-switcher__arrow"
+          data-next
+          aria-label="{{ 'botoms.card_switcher.next' | t }}"
+        >
+          <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" width="20" height="20"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+      <p class="visually-hidden" aria-live="polite" data-status></p>
+    {%- endif -%}
+  </section>
+</botoms-card-switcher>
+
+{% stylesheet %}
+  .botoms-switcher {
+    --card-width: min(72vw, 340px);
+    --card-overlap: 0.14;
+    --card-radius: 20px;
+
+    display: block;
+    overflow: hidden;
+    background-color: var(--botoms-cream);
+    padding-block: var(--switcher-padding-top) var(--switcher-padding-bottom);
+  }
+
+  @media screen and (min-width: 750px) {
+    .botoms-switcher {
+      --card-width: min(30vw, 400px);
+      --card-overlap: 0.12;
+    }
+  }
+
+  .botoms-switcher__heading {
+    margin: 0 0 8px;
+    padding-inline: 16px;
+    text-align: center;
+    font-family: var(--font-heading--family);
+    font-weight: var(--font-heading--weight);
+    font-size: clamp(1.5rem, 1.2rem + 1.4vw, 2.25rem);
+    line-height: 1.15;
+    color: var(--botoms-ink);
+  }
+
+  .botoms-switcher__track {
+    display: flex;
+    align-items: center;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    padding-inline: calc(50% - var(--card-width) / 2 + var(--card-width) * var(--card-overlap));
+    padding-block: 28px 36px;
+    perspective: 1400px;
+    cursor: grab;
+  }
+
+  .botoms-switcher__track::-webkit-scrollbar {
+    display: none;
+  }
+
+  .botoms-switcher__track.is-dragging {
+    scroll-snap-type: none;
+    cursor: grabbing;
+  }
+
+  .botoms-switcher__card {
+    position: relative;
+    display: block;
+    flex: 0 0 var(--card-width);
+    margin-inline: calc(var(--card-width) * var(--card-overlap) * -1);
+    scroll-snap-align: center;
+    border-radius: var(--card-radius);
+    transform-origin: 50% 60%;
+    will-change: transform;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+  }
+
+  .botoms-switcher__track--static .botoms-switcher__card {
+    margin-inline: 8px;
+  }
+
+  .botoms-switcher__frame {
+    display: block;
+    aspect-ratio: 3 / 4;
+    overflow: hidden;
+    border: 3px solid transparent;
+    border-radius: var(--card-radius);
+    background-color: var(--botoms-photo-white);
+    box-shadow: 0 18px 36px -20px rgb(var(--botoms-ink-rgb) / 0.45);
+    transition: border-color 0.25s ease, box-shadow 0.25s ease;
+  }
+
+  .botoms-switcher__card[data-active] .botoms-switcher__frame {
+    border-color: var(--botoms-white);
+    box-shadow: 0 28px 56px -22px rgb(var(--botoms-ink-rgb) / 0.55);
+  }
+
+  .botoms-switcher__card:focus-visible {
+    outline: none;
+  }
+
+  .botoms-switcher__card:focus-visible .botoms-switcher__frame {
+    border-color: var(--botoms-forest);
+  }
+
+  .botoms-switcher__image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    pointer-events: none;
+    -webkit-user-drag: none;
+  }
+
+  .botoms-switcher__caption {
+    display: grid;
+    grid-template-columns: 44px minmax(0, 1fr) 44px;
+    align-items: center;
+    gap: 12px;
+    max-width: 560px;
+    margin-inline: auto;
+    padding-inline: 16px;
+  }
+
+  .botoms-switcher__arrow {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 1px solid var(--botoms-control);
+    border-radius: 50%;
+    background: transparent;
+    color: var(--botoms-ink);
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+
+  .botoms-switcher__arrow:hover {
+    background-color: var(--botoms-ink);
+    color: var(--botoms-white);
+  }
+
+  .botoms-switcher__arrow:focus-visible {
+    outline: 2px solid var(--botoms-forest);
+    outline-offset: 2px;
+  }
+
+  .botoms-switcher__panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    text-align: center;
+    animation: botoms-switcher-in 0.3s ease;
+  }
+
+  .botoms-switcher__panel[hidden] {
+    display: none;
+  }
+
+  .botoms-switcher__title {
+    margin: 0;
+    font-family: var(--font-heading--family);
+    font-weight: var(--font-heading--weight);
+    font-size: clamp(1.25rem, 1.1rem + 0.6vw, 1.625rem);
+    line-height: 1.2;
+    color: var(--botoms-ink);
+  }
+
+  .botoms-switcher__meta {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 4px 12px;
+    margin: 0;
+    font-size: 0.9375rem;
+    color: var(--botoms-muted-ink);
+  }
+
+  .botoms-switcher__price {
+    color: var(--botoms-ink);
+  }
+
+  .botoms-switcher__price--sale {
+    color: var(--botoms-rose);
+  }
+
+  .botoms-switcher__price--was {
+    margin-inline-start: 6px;
+    color: var(--botoms-muted-ink);
+  }
+
+  .botoms-switcher__colours {
+    display: flex;
+    gap: 10px;
+    margin: 2px 0 4px;
+    padding: 0;
+    list-style: none;
+  }
+
+  .botoms-switcher__colour {
+    display: block;
+    width: 32px;
+    height: 32px;
+    overflow: hidden;
+    border-radius: 50%;
+    background-color: var(--botoms-photo-white);
+    box-shadow: 0 0 0 1px var(--botoms-line);
+  }
+
+  .botoms-switcher__colour[aria-current='true'] {
+    box-shadow: 0 0 0 2px var(--botoms-cream), 0 0 0 3.5px var(--botoms-ink);
+  }
+
+  .botoms-switcher__colour img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .botoms-switcher__cta {
+    min-width: 180px;
+  }
+
+  @keyframes botoms-switcher-in {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .botoms-switcher__card {
+      margin-inline: 8px;
+      transform: none !important;
+      will-change: auto;
+    }
+
+    .botoms-switcher__track {
+      padding-inline: calc(50% - var(--card-width) / 2);
+      perspective: none;
+    }
+
+    .botoms-switcher__panel {
+      animation: none;
+    }
+  }
+{% endstylesheet %}
+
+{% javascript %}
+  class BotomsCardSwitcher extends HTMLElement {
+    connectedCallback() {
+      this.track = this.querySelector('[data-track]');
+      if (!this.track) return;
+
+      this.cards = Array.from(this.track.querySelectorAll('[data-card]'));
+      this.count = Number(this.dataset.count) || this.cards.length;
+      this.looping = this.cards.length > this.count;
+      this.panels = Array.from(this.querySelectorAll('[data-panel]'));
+      this.status = this.querySelector('[data-status]');
+      this.reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+      this.activeIndex = -1;
+      this.interacted = false;
+
+      this.onScroll = this.onScroll.bind(this);
+      this.settle = this.settle.bind(this);
+      this.update = this.update.bind(this);
+
+      this.track.addEventListener('scroll', this.onScroll, { passive: true });
+      this.track.addEventListener('scrollend', this.settle);
+      this.track.addEventListener('pointerdown', (event) => this.onPointerDown(event));
+      this.track.addEventListener('click', (event) => this.onClick(event), true);
+      this.track.addEventListener('focusin', (event) => this.onFocus(event));
+      this.track.addEventListener('keydown', (event) => this.onKeydown(event));
+      this.querySelector('[data-prev]')?.addEventListener('click', () => this.step(-1));
+      this.querySelector('[data-next]')?.addEventListener('click', () => this.step(1));
+
+      this.resizeObserver = new ResizeObserver(() => {
+        this.scrollToCard(this.cardIndexNearCenter(), 'instant');
+        this.update();
+      });
+      this.resizeObserver.observe(this.track);
+      this.reducedMotion.addEventListener('change', this.update);
+
+      requestAnimationFrame(() => {
+        this.scrollToCard(this.looping ? this.count : 0, 'instant');
+        this.update();
+        this.settle();
+      });
+    }
+
+    disconnectedCallback() {
+      this.resizeObserver?.disconnect();
+      this.reducedMotion?.removeEventListener('change', this.update);
+    }
+
+    cardCenter(card) {
+      return card.offsetLeft + card.offsetWidth / 2;
+    }
+
+    viewCenter() {
+      return this.track.scrollLeft + this.track.clientWidth / 2;
+    }
+
+    stepWidth() {
+      const [first, second] = this.cards;
+      return second ? second.offsetLeft - first.offsetLeft : first.offsetWidth;
+    }
+
+    cardIndexNearCenter() {
+      const center = this.viewCenter();
+      let nearest = 0;
+      let best = Infinity;
+      this.cards.forEach((card, index) => {
+        const distance = Math.abs(this.cardCenter(card) - center);
+        if (distance < best) {
+          best = distance;
+          nearest = index;
+        }
+      });
+      return nearest;
+    }
+
+    scrollToCard(index, behavior = 'smooth') {
+      const card = this.cards[index];
+      if (!card) return;
+      const left = this.cardCenter(card) - this.track.clientWidth / 2;
+      this.track.scrollTo({ left, behavior: this.reducedMotion.matches ? 'instant' : behavior });
+    }
+
+    step(direction) {
+      this.interacted = true;
+      this.scrollToCard(this.cardIndexNearCenter() + direction);
+    }
+
+    onScroll() {
+      if (!this.ticking) {
+        this.ticking = true;
+        requestAnimationFrame(() => {
+          this.ticking = false;
+          this.update();
+        });
+      }
+      clearTimeout(this.settleTimer);
+      this.settleTimer = setTimeout(this.settle, 150);
+    }
+
+    update() {
+      const center = this.viewCenter();
+      const width = this.stepWidth() || 1;
+      const flat = this.reducedMotion.matches;
+
+      this.cards.forEach((card) => {
+        const offset = (this.cardCenter(card) - center) / width;
+        const distance = Math.abs(offset);
+        const clamped = Math.max(-2.5, Math.min(2.5, offset));
+
+        card.toggleAttribute('data-active', distance < 0.5);
+        card.style.zIndex = String(100 - Math.round(distance * 10));
+
+        if (flat) {
+          card.style.transform = '';
+          card.style.opacity = '';
+          return;
+        }
+
+        const scale = 1 - Math.min(distance, 2.5) * 0.1;
+        const rotate = clamped * -7;
+        card.style.transform = `perspective(1400px) rotateY(${rotate}deg) scale(${scale})`;
+        card.style.opacity = distance > 2.75 ? '0' : '1';
+      });
+    }
+
+    settle() {
+      if (this.dragging) return;
+      this.track.classList.remove('is-dragging');
+
+      let index = this.cardIndexNearCenter();
+      if (this.looping && (index < this.count || index >= this.count * 2)) {
+        const shift = (index < this.count ? this.count : -this.count) * this.stepWidth();
+        this.track.scrollTo({ left: this.track.scrollLeft + shift, behavior: 'instant' });
+        index = this.looping ? (index % this.count) + this.count : index;
+        this.update();
+      }
+
+      const realIndex = index % this.count;
+      if (realIndex === this.activeIndex) return;
+      this.activeIndex = realIndex;
+
+      this.panels.forEach((panel) => {
+        panel.hidden = Number(panel.dataset.panel) !== realIndex;
+      });
+
+      if (this.interacted && this.status) {
+        const card = this.cards[index];
+        this.status.textContent = this.dataset.positionLabel
+          .replace('[index]', realIndex + 1)
+          .replace('[count]', this.count)
+          .replace('[title]', card.getAttribute('aria-label') || '');
+      }
+    }
+
+    onPointerDown(event) {
+      this.interacted = true;
+      if (event.pointerType !== 'mouse' || event.button !== 0) return;
+
+      this.dragging = true;
+      this.dragMoved = false;
+      this.dragStartX = event.clientX;
+      this.dragStartScroll = this.track.scrollLeft;
+      this.track.classList.add('is-dragging');
+
+      const onMove = (moveEvent) => {
+        const delta = moveEvent.clientX - this.dragStartX;
+        if (Math.abs(delta) > 6) this.dragMoved = true;
+        this.track.scrollLeft = this.dragStartScroll - delta;
+      };
+      const onUp = (upEvent) => {
+        window.removeEventListener('pointermove', onMove);
+        window.removeEventListener('pointerup', onUp);
+        this.dragging = false;
+        const delta = upEvent.clientX - this.dragStartX;
+        let target = this.cardIndexNearCenter();
+        if (this.dragMoved && Math.abs(delta) > 40 && target === this.indexAtDragStart) {
+          target += delta < 0 ? 1 : -1;
+        }
+        this.scrollToCard(target);
+      };
+
+      this.indexAtDragStart = this.cardIndexNearCenter();
+      window.addEventListener('pointermove', onMove);
+      window.addEventListener('pointerup', onUp);
+    }
+
+    onClick(event) {
+      const card = event.target.closest('[data-card]');
+      if (!card) return;
+
+      if (this.dragMoved) {
+        event.preventDefault();
+        this.dragMoved = false;
+        return;
+      }
+
+      if (!card.hasAttribute('data-active')) {
+        event.preventDefault();
+        this.interacted = true;
+        this.scrollToCard(this.cards.indexOf(card));
+      }
+    }
+
+    onFocus(event) {
+      const card = event.target.closest('[data-card]');
+      if (card && !card.hasAttribute('data-active')) {
+        this.interacted = true;
+        this.scrollToCard(this.cards.indexOf(card));
+      }
+    }
+
+    onKeydown(event) {
+      if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+        event.preventDefault();
+        this.step(event.key === 'ArrowLeft' ? -1 : 1);
+        requestAnimationFrame(() => {
+          const index = this.cardIndexNearCenter();
+          const target = this.looping ? (index % this.count) + this.count : index;
+          setTimeout(() => this.cards[target]?.focus({ preventScroll: true }), 350);
+        });
+      }
+    }
+  }
+
+  if (!customElements.get('botoms-card-switcher')) {
+    customElements.define('botoms-card-switcher', BotomsCardSwitcher);
+  }
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "Botoms card switcher",
+  "tag": "div",
+  "class": "section-botoms-card-switcher",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "info": "Optional. Keep it short; the photos lead."
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "Top padding",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "Bottom padding",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 40
+    }
+  ],
+  "blocks": [
+    {
+      "type": "card",
+      "name": "Card",
+      "settings": [
+        {
+          "type": "product",
+          "id": "product",
+          "label": "Product"
+        },
+        {
+          "type": "text",
+          "id": "colour",
+          "label": "Colour",
+          "info": "Exact colour option value, e.g. Black. The card shows and links to that colour."
+        },
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "Collection",
+          "info": "Used when no product is chosen."
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image",
+          "info": "Optional. Defaults to the colour's product photo. Use a portrait (3:4) photo."
+        },
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Title override"
+        }
+      ]
+    }
+  ],
+  "max_blocks": 12,
+  "presets": [
+    {
+      "name": "Botoms card switcher",
+      "blocks": [{ "type": "card" }, { "type": "card" }, { "type": "card" }]
+    }
+  ]
+}
+{% endschema %}
