@@ -174,10 +174,10 @@
 
 {% stylesheet %}
   .botoms-dual {
-    --dual-line: rgb(251 248 244 / 0.16);
+    --dual-line: rgb(var(--botoms-ink-rgb) / 0.16);
 
-    background: var(--botoms-ink);
-    color: var(--botoms-cream);
+    background: var(--botoms-tomatillo);
+    color: var(--botoms-ink);
   }
 
   .botoms-dual__hero {
@@ -207,7 +207,7 @@
     font-weight: 400;
     line-height: 0.98;
     letter-spacing: -0.04em;
-    color: var(--botoms-cream);
+    color: var(--botoms-ink);
   }
 
   .botoms-dual__heading em {
@@ -216,7 +216,7 @@
     font-style: italic;
     font-weight: 400;
     letter-spacing: -0.02em;
-    color: var(--botoms-pink-cherub);
+    color: var(--botoms-ink);
   }
 
   .botoms-dual__text {
@@ -224,7 +224,7 @@
     margin: 0 0 22px;
     font-size: 1rem;
     line-height: 1.5;
-    color: rgb(251 248 244 / 0.82);
+    color: rgb(var(--botoms-ink-rgb) / 0.82);
   }
 
   .botoms-dual__actions {
@@ -239,7 +239,7 @@
     gap: 8px;
     align-items: center;
     min-height: 44px;
-    color: var(--botoms-cream);
+    color: var(--botoms-ink);
     font-size: 0.9375rem;
     text-decoration: underline;
     text-underline-offset: 5px;
@@ -268,17 +268,17 @@
     align-items: center;
     min-height: 40px;
     padding: 0 14px 0 10px;
-    border: 1px solid rgb(251 248 244 / 0.35);
+    border: 1px solid rgb(var(--botoms-ink-rgb) / 0.35);
     border-radius: 999px;
-    color: var(--botoms-cream);
+    color: var(--botoms-ink);
     font-size: 0.875rem;
     text-decoration: none;
     transition: background-color 0.2s ease, color 0.2s ease;
   }
 
   .botoms-dual__chip:hover {
-    background-color: var(--botoms-cream);
-    color: var(--botoms-ink);
+    background-color: var(--botoms-ink);
+    color: var(--botoms-cream);
   }
 
   .botoms-dual__chip .swatch {
@@ -289,12 +289,12 @@
     width: 16px;
     height: 16px;
     border-radius: 50%;
-    box-shadow: 0 0 0 1px rgb(251 248 244 / 0.5);
+    box-shadow: 0 0 0 1px rgb(var(--botoms-ink-rgb) / 0.5);
   }
 
   .botoms-dual__size-link:focus-visible,
   .botoms-dual__chip:focus-visible {
-    outline: 2px solid var(--botoms-pink-cherub);
+    outline: 2px solid var(--botoms-ink);
     outline-offset: 3px;
   }
 
@@ -314,14 +314,14 @@
   .botoms-dual__button:focus-visible,
   .botoms-dual__tile:focus-visible,
   .botoms-dual__pause:focus-visible {
-    outline: 2px solid var(--botoms-pink-cherub);
+    outline: 2px solid var(--botoms-ink);
     outline-offset: 3px;
   }
 
   .botoms-dual__footnote {
     display: none;
     margin-top: auto;
-    color: rgb(251 248 244 / 0.7);
+    color: rgb(var(--botoms-ink-rgb) / 0.7);
   }
 
   .botoms-dual__tracks {
@@ -427,7 +427,7 @@
     flex-shrink: 0;
     min-height: 32px;
     white-space: nowrap;
-    color: var(--botoms-cream);
+    color: var(--botoms-ink);
     font-size: 12px;
     letter-spacing: 0;
     text-transform: none;
