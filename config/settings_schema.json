@@ -2116,5 +2116,36 @@
         "default": "equal-width-buttons"
       }
     ]
+  },
+  {
+    "name": "Botoms cart",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "Cart drawer extras added for Botoms."
+      },
+      {
+        "type": "number",
+        "id": "botoms_free_shipping_threshold",
+        "label": "Free delivery threshold (₹)",
+        "default": 0,
+        "info": "0 hides the progress bar. Must match your real shipping rates (Settings > Shipping and delivery)."
+      },
+      {
+        "type": "collection",
+        "id": "botoms_cart_upsell_collection",
+        "label": "Upsell collection",
+        "info": "Products suggested in the cart. Items already in the cart are skipped."
+      },
+      {
+        "type": "range",
+        "id": "botoms_cart_upsell_limit",
+        "label": "Upsell products",
+        "min": 0,
+        "max": 4,
+        "step": 1,
+        "default": 2
+      }
+    ]
   }
 ]

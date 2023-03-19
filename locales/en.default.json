@@ -26,6 +26,15 @@
     "fabric_story": {
       "shop": "Shop {{ fabric }}"
     },
+    "cart": {
+      "free_delivery_remaining": "Add {{ amount }} more for free delivery",
+      "free_delivery_unlocked": "You've unlocked free delivery",
+      "upsell_heading": "Complete your look",
+      "upsell_size": "Size for {{ product }}",
+      "upsell_add": "Add",
+      "upsell_add_label": "Add {{ product }} to cart",
+      "upsell_error": "Couldn't add this item. Try again."
+    },
     "product": {
       "feel": "How it feels",
       "feel_value": "{{ value }} out of {{ max }}",
@@ -76,7 +85,7 @@
       "pincode_placeholder": "6-digit pincode",
       "pincode_submit": "Check",
       "pincode_invalid": "Enter a valid 6-digit pincode.",
-      "pincode_result": "We deliver to {{ pincode }}. Delivery date and charges are shown at checkout.",
+      "pincode_result": "We deliver to {{ pincode }}. Delivery date and charges are shown at checkout.",
       "pairs_heading": "Pairs with your kurti",
       "pairs_other_lengths": "Same style, other lengths",
       "pairs_goes_with": "Goes with kurtis in",

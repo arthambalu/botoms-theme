@@ -114,6 +114,9 @@
     "variant_button_border_width": 1,
     "variant_button_radius": 4,
     "variant_button_width": "equal-width-buttons",
+    "botoms_free_shipping_threshold": 0,
+    "botoms_cart_upsell_collection": "bestsellers",
+    "botoms_cart_upsell_limit": 2,
     "content_for_index": [],
     "color_palette": {
       "background": "#FBF8F4",
