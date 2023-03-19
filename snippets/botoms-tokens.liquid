@@ -165,11 +165,16 @@
     align-self: flex-start;
     width: max-content;
     max-width: calc(100% - 64px);
-    height: 28px;
-    margin: -40px 0 8px 8px;
-    padding: 0 2px;
+    height: 22px;
+    margin: -34px 0 8px 8px;
+    padding: 0 3px;
     border-radius: 999px;
     background: rgb(255 255 255 / 0.92);
+  }
+
+  /* Smaller dots than Horizon's card default (up to 28px). */
+  .product-card__content > product-swatches .swatch {
+    --max-swatch-size: 14px;
   }
 
   /* The swatch list keeps a hidden slot for its "+N" counter; a tight gap stops it padding the pill. */
