@@ -41,14 +41,15 @@
             "border": "none",
             "border_width": 1,
             "border_opacity": 100,
-            "border_radius": 0,
+            "border_radius": 20,
             "link": "",
             "open_in_new_tab": false,
             "placeholder": "",
-            "padding-block-start": 0,
-            "padding-block-end": 0,
-            "padding-inline-start": 0,
-            "padding-inline-end": 0
+            "padding-block-start": 28,
+            "padding-block-end": 28,
+            "padding-inline-start": 24,
+            "padding-inline-end": 24,
+            "background_color": "{{ settings.color_palette.color2 }}"
           },
           "blocks": {
             "text_pF6rVi": {
@@ -113,8 +114,8 @@
                 "input_style": "custom",
                 "border_width": 1,
                 "border_radius": 100,
-                "input_background_color": "{{ settings.color_palette.color1 }}",
-                "input_border_color": "",
+                "input_background_color": "#FFFFFF",
+                "input_border_color": "#7D8778",
                 "input_type_preset": "paragraph",
                 "style_class": "button-secondary",
                 "custom_button_background": "{{ settings.color_palette.foreground }}",
@@ -182,7 +183,7 @@
       "settings": {
         "section_width": "page-width",
         "gap": 40,
-        "background_color": "{{ settings.color_palette.color1 }}",
+        "background_color": "{{ settings.color_palette.background }}",
         "padding-block-start": 36,
         "padding-block-end": 36
       }
@@ -196,7 +197,7 @@
             "show_powered_by": false,
             "font_size": "0.75rem",
             "case": "none",
-            "text_color": "#E6E1DA"
+            "text_color": "#5B6655"
           }
         },
         "policy_list": {
@@ -225,7 +226,7 @@
       "settings": {
         "section_width": "page-width",
         "gap": 24,
-        "background_color": "{{ settings.color_palette.color1 }}",
+        "background_color": "{{ settings.color_palette.background }}",
         "divider_thickness": 1,
         "padding-block-start": 12,
         "padding-block-end": 16

@@ -33,8 +33,60 @@
     background-color: var(--botoms-photo-white);
   }
 
+  .announcement-bar .announcement-bar__text {
+    display: block;
+    width: fit-content;
+    max-width: calc(100% - 32px);
+    align-self: center;
+    margin-inline: auto;
+    padding: 4px 14px;
+    border-radius: 999px;
+    background-color: var(--botoms-pink-cherub);
+    color: var(--botoms-ink);
+  }
+
+  #header-component .header__row--top {
+    box-sizing: border-box;
+    width: calc(100% - 24px);
+    margin: 8px 12px 0;
+    border-radius: 999px;
+    background-color: var(--botoms-white);
+    box-shadow: 0 10px 28px -18px rgb(var(--botoms-ink-rgb) / 0.45);
+    transition: box-shadow 0.25s ease, margin 0.25s ease;
+  }
+
+  #header-component[data-sticky-state='active'] .header__row--top {
+    margin-top: 6px;
+    box-shadow: 0 16px 32px -14px rgb(var(--botoms-ink-rgb) / 0.5);
+  }
+
+  @media screen and (min-width: 750px) {
+    #header-component .header__row--top {
+      width: calc(100% - 48px);
+      margin: 10px 24px 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    #header-component .header__row--top {
+      transition: none;
+    }
+  }
+
+  button.shopify-payment-button__button--unbranded {
+    --button-background-color: transparent;
+    --button-color: var(--botoms-ink);
+    --button-border-color: var(--botoms-ink);
+    --button-border-width: 1.5px;
+    border-radius: var(--style-border-radius-buttons-secondary);
+  }
+
+  button.shopify-payment-button__button--unbranded:hover {
+    --button-background-color: var(--botoms-white);
+  }
+
   .footer-utilities .policy-list-trigger {
-    color: var(--botoms-line);
+    color: var(--botoms-muted-ink);
   }
 
   .slideshow-control {
