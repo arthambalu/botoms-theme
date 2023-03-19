@@ -1,0 +1,59 @@
+{%- doc -%}
+  "Goes with kurtis in" colour dots (product metafield custom.pairs_with_colours), shown under the size
+  buttons. Rendered inside <variant-picker> so it also appears in the quick-add "Choose size" sheet.
+  Hidden on the product page itself, where the "Pairs with your kurti" section already shows it.
+
+  @param {product} product - The product
+
+  @example
+  {% render 'botoms-kurti-colours', product: product_resource %}
+{%- enddoc -%}
+
+{%- assign kurti_colours = product.metafields.custom.pairs_with_colours.value -%}
+{%- if kurti_colours != blank -%}
+  <div class="botoms-kurti-colours">
+    <p class="botoms-kurti-colours__label">{{ 'botoms.product.pairs_goes_with' | t }}</p>
+    <ul class="botoms-kurti-colours__dots" role="list">
+      {%- for colour in kurti_colours limit: 8 -%}
+        <li><span class="botoms-kurti-colours__dot" style="--dot: {{ colour }};"></span></li>
+      {%- endfor -%}
+    </ul>
+  </div>
+{%- endif -%}
+
+{% stylesheet %}
+  .botoms-kurti-colours {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 12px;
+    align-items: center;
+    margin-top: 12px;
+  }
+
+  .botoms-kurti-colours__label {
+    margin: 0;
+    color: var(--botoms-muted-ink);
+    font-size: 0.875rem;
+  }
+
+  .botoms-kurti-colours__dots {
+    display: flex;
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .botoms-kurti-colours__dot {
+    display: block;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--dot);
+    box-shadow: inset 0 0 0 1px rgb(var(--botoms-ink-rgb) / 0.18);
+  }
+
+  .product-information .botoms-kurti-colours {
+    display: none;
+  }
+{% endstylesheet %}
