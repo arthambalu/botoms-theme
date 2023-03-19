@@ -9,8 +9,11 @@
  */
 {
   "current": {
-    "logo_height": 36,
-    "logo_height_mobile": 28,
+    "logo": "shopify://shop_images/botoms-wordmark-ink.png",
+    "logo_inverse": "shopify://shop_images/botoms-wordmark-white.png",
+    "favicon": "shopify://shop_images/botoms-favicon-512.png",
+    "logo_height": 32,
+    "logo_height_mobile": 24,
     "page_text_color": "{{ settings.color_palette.foreground }}",
     "type_body_font": "inter_n4",
     "type_subheading_font": "inter_n5",
