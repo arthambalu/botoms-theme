@@ -31,20 +31,33 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    flex-shrink: 0;
+    min-height: 32px;
     margin-inline-end: 6px;
     color: var(--color-foreground);
+  }
+
+  .botoms-wishlist-link .botoms-icon {
+    flex-shrink: 0;
+  }
+
+  /* Bigger tap area without widening the crowded mobile header. */
+  .botoms-wishlist-link::after {
+    content: '';
+    position: absolute;
+    inset: 0 -8px;
   }
 
   .botoms-wishlist-link__count {
     position: absolute;
     top: 50%;
-    right: -9px;
+    left: 50%;
     display: grid;
     place-items: center;
     min-width: 16px;
     height: 16px;
     padding: 0 4px;
-    transform: translateY(-17px);
+    transform: translate(3px, -17px);
     border-radius: 999px;
     background: var(--botoms-pink-cherub);
     color: var(--botoms-ink);

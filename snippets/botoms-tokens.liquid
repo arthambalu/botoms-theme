@@ -39,7 +39,7 @@
     max-width: calc(100% - 32px);
     align-self: center;
     margin-inline: auto;
-    padding: 4px 14px;
+    padding: 6px 14px;
     border-radius: 999px;
     background-color: var(--botoms-pink-cherub);
     color: var(--botoms-ink);
@@ -139,6 +139,13 @@
   @media screen and (min-width: 750px) {
     .product-information {
       padding-block-start: 24px;
+    }
+
+    /* Tablet Shop All: the filter sidebar leaves room for one "medium" card; keep two per row. */
+    @container product-grid (max-width: 640px) {
+      .product-grid.product-grid--grid:not([product-grid-view='zoom-out']) {
+        --product-grid-columns-desktop: repeat(2, minmax(0, 1fr));
+      }
     }
   }
 {% endstyle %}

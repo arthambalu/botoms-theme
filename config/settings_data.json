@@ -124,7 +124,8 @@
       "color1": "#2F4A2B",
       "color2": "#FDBCC6",
       "color3": "#D1E2AE"
-    }
+    },
+    "auto_open_cart_drawer": true
   },
   "presets": {
     "Default": {
