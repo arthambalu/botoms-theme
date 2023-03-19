@@ -99,6 +99,21 @@
       "pairs_other_lengths": "Same style, other lengths",
       "pairs_goes_with": "Goes with kurtis in",
       "pairs_more": "Complete the look"
+    },
+    "wishlist": {
+      "title": "Wishlist",
+      "open": "Wishlist",
+      "add": "Save {{ title }} to wishlist",
+      "remove": "Remove {{ title }} from wishlist",
+      "added": "Saved to wishlist",
+      "removed": "Removed from wishlist",
+      "share": "Share {{ title }}",
+      "copied": "Link copied",
+      "note": "Saved on this device.",
+      "empty_heading": "Nothing saved yet",
+      "empty_text": "Tap the heart on any style to keep it here for later.",
+      "empty_cta": "Shop all",
+      "loading": "Loading your saved styles"
     }
   },
   "accessibility": {

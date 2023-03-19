@@ -1,0 +1,216 @@
+{%- liquid
+  assign shop_all = collections['shop-all']
+  if shop_all != blank
+    assign shop_url = shop_all.url
+  else
+    assign shop_url = routes.all_products_collection_url
+  endif
+  assign item_root = routes.root_url | append: '/products/' | replace: '//', '/'
+-%}
+
+<div
+  class="botoms-wishlist"
+  style="--wishlist-padding-top: {{ section.settings.padding-block-start }}px; --wishlist-padding-bottom: {{ section.settings.padding-block-end }}px;"
+>
+  <div class="botoms-wishlist__inner">
+    <header class="botoms-wishlist__header">
+      <h1 class="botoms-wishlist__heading">{{ page.title | default: section.settings.heading }}</h1>
+      <p class="botoms-wishlist__note">{{ 'botoms.wishlist.note' | t }}</p>
+    </header>
+
+    <botoms-wishlist-page data-item-root="{{ item_root }}">
+      <p class="botoms-wishlist__loading">{{ 'botoms.wishlist.loading' | t }}</p>
+      <ul class="botoms-wishlist__grid" role="list" hidden></ul>
+      <div class="botoms-wishlist__empty" hidden>
+        <span class="botoms-wishlist__empty-icon">{% render 'botoms-icon', name: 'heart', size: 28 %}</span>
+        <h2 class="botoms-wishlist__empty-heading">{{ 'botoms.wishlist.empty_heading' | t }}</h2>
+        <p>{{ 'botoms.wishlist.empty_text' | t }}</p>
+        <a class="button" href="{{ shop_url }}">{{ 'botoms.wishlist.empty_cta' | t }}</a>
+      </div>
+    </botoms-wishlist-page>
+  </div>
+</div>
+
+{% stylesheet %}
+  .botoms-wishlist {
+    padding: var(--wishlist-padding-top) 16px var(--wishlist-padding-bottom);
+    color: var(--botoms-ink);
+  }
+
+  .botoms-wishlist__inner {
+    max-width: 1200px;
+    margin-inline: auto;
+  }
+
+  .botoms-wishlist__header {
+    margin-bottom: 20px;
+  }
+
+  .botoms-wishlist__heading {
+    margin: 0;
+  }
+
+  .botoms-wishlist__note,
+  .botoms-wishlist__loading {
+    margin: 4px 0 0;
+    color: var(--botoms-muted-ink);
+    font-size: 0.875rem;
+  }
+
+  .botoms-wishlist__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px 12px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .botoms-wishlist__grid[hidden],
+  .botoms-wishlist__empty[hidden],
+  .botoms-wishlist__loading[hidden] {
+    display: none;
+  }
+
+  .botoms-wishlist__empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    max-width: 360px;
+    margin: 24px auto 0;
+    padding: 32px 24px;
+    border-radius: 20px;
+    background: var(--botoms-pink-cherub);
+    text-align: center;
+  }
+
+  .botoms-wishlist__empty p {
+    margin: 0 0 8px;
+  }
+
+  .botoms-wishlist__empty-icon {
+    display: grid;
+    place-items: center;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--botoms-white);
+    color: var(--botoms-rose);
+  }
+
+  .botoms-wishlist__empty-heading {
+    margin: 4px 0 0;
+    font-size: 1.375rem;
+  }
+
+  @media screen and (min-width: 750px) {
+    .botoms-wishlist {
+      padding-inline: 24px;
+    }
+
+    .botoms-wishlist__grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 32px 20px;
+    }
+  }
+{% endstylesheet %}
+
+{% javascript %}
+  (() => {
+    if (customElements.get('botoms-wishlist-page')) return;
+
+    // Renders the saved styles: each card comes from the botoms-wishlist-item section in its product's context.
+    class BotomsWishlistPage extends HTMLElement {
+      cards = new Map();
+
+      connectedCallback() {
+        this.grid = this.querySelector('.botoms-wishlist__grid');
+        this.empty = this.querySelector('.botoms-wishlist__empty');
+        this.loading = this.querySelector('.botoms-wishlist__loading');
+        // The wishlist store is defined with the header's wishlist link.
+        customElements.whenDefined('botoms-wishlist-count').then(() => {
+          if (!this.isConnected) return;
+          this.wishlist = window.BotomsWishlist;
+          document.addEventListener(this.wishlist.CHANGE, this.render);
+          this.render();
+        });
+      }
+
+      disconnectedCallback() {
+        if (this.wishlist) document.removeEventListener(this.wishlist.CHANGE, this.render);
+      }
+
+      fetchCard(handle) {
+        if (!this.cards.has(handle)) {
+          const url = `${this.dataset.itemRoot}${encodeURIComponent(handle)}?section_id=botoms-wishlist-item`;
+          const card = fetch(url)
+            .then((response) => (response.ok ? response.text() : ''))
+            .then((html) => new DOMParser().parseFromString(html, 'text/html').querySelector('.botoms-mini-card'))
+            .catch(() => null);
+          this.cards.set(handle, card);
+        }
+        return this.cards.get(handle);
+      }
+
+      render = async () => {
+        const handles = this.wishlist.handles();
+        const cards = await Promise.all(handles.map((handle) => this.fetchCard(handle)));
+        // A newer change may have rendered already.
+        if (handles.join() !== this.wishlist.handles().join()) return;
+
+        const found = cards.filter(Boolean);
+        // Products that no longer exist drop out of the list.
+        handles.forEach((handle, index) => {
+          if (cards[index] === null) this.wishlist.remove(handle);
+        });
+
+        this.grid.replaceChildren(...found);
+        this.grid.hidden = found.length === 0;
+        this.empty.hidden = found.length > 0;
+        this.loading.hidden = true;
+      };
+    }
+
+    customElements.define('botoms-wishlist-page', BotomsWishlistPage);
+  })();
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "Botoms wishlist",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Wishlist"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "Top padding",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "Bottom padding",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 48
+    }
+  ],
+  "presets": [
+    {
+      "name": "Botoms wishlist"
+    }
+  ]
+}
+{% endschema %}

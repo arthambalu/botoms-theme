@@ -2,12 +2,13 @@
   Compact product card (portrait photo, title, price) used in Botoms product rows.
 
   @param {product} card_product - The product to show
+  @param {boolean} [show_actions] - Show the wishlist heart over the photo
 
   @example
   {% render 'botoms-mini-card', card_product: product %}
 {%- enddoc -%}
 
-<li class="botoms-mini-card">
+<li class="botoms-mini-card" data-handle="{{ card_product.handle }}">
   <a class="botoms-mini-card__link" href="{{ card_product.url }}">
     <span class="botoms-mini-card__frame">
       {%- if card_product.featured_image != blank -%}
@@ -30,10 +31,14 @@
       {%- endif -%}
     </span>
   </a>
+  {%- if show_actions -%}
+    {% render 'botoms-card-actions', card_product: card_product, show_share: false %}
+  {%- endif -%}
 </li>
 
 {% stylesheet %}
   .botoms-mini-card {
+    position: relative;
     scroll-snap-align: start;
   }
 

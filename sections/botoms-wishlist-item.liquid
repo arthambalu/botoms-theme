@@ -1,0 +1,17 @@
+{%- comment -%}
+  One saved style for the wishlist page, fetched with the Section Rendering API:
+  /products/<handle>?section_id=botoms-wishlist-item. No presets, so it isn't offered in the theme editor.
+{%- endcomment -%}
+
+{%- if product != blank -%}
+  <ul class="botoms-wishlist-item-source">
+    {% render 'botoms-mini-card', card_product: product, show_actions: true %}
+  </ul>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Botoms wishlist item",
+  "settings": []
+}
+{% endschema %}

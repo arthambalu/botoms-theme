@@ -1,0 +1,132 @@
+{%- doc -%}
+  Wishlist heart and share buttons over a product photo (top-right). No like counts:
+  the heart only saves the style on this device (see `botoms-wishlist-link`).
+
+  @param {product} card_product - The product on the card
+  @param {boolean} [show_share] - Show the share button, default true
+
+  @example
+  {% render 'botoms-card-actions', card_product: product %}
+{%- enddoc -%}
+
+{%- liquid
+  assign product_title = card_product.title | escape
+  assign share_on = true
+  if show_share == false
+    assign share_on = false
+  endif
+-%}
+
+<div class="botoms-card-actions">
+  <botoms-wishlist-button
+    data-handle="{{ card_product.handle }}"
+    data-label-add="{{ 'botoms.wishlist.add' | t: title: product_title }}"
+    data-label-remove="{{ 'botoms.wishlist.remove' | t: title: product_title }}"
+    data-added="{{ 'botoms.wishlist.added' | t }}"
+    data-removed="{{ 'botoms.wishlist.removed' | t }}"
+  >
+    <button
+      type="button"
+      class="botoms-card-actions__button botoms-card-actions__button--heart button-unstyled"
+      aria-pressed="false"
+      aria-label="{{ 'botoms.wishlist.add' | t: title: product_title }}"
+    >
+      {% render 'botoms-icon', name: 'heart', size: 18 %}
+    </button>
+  </botoms-wishlist-button>
+
+  {%- if share_on -%}
+    <botoms-share-button
+      data-url="{{ card_product.url }}"
+      data-title="{{ product_title }}"
+      data-copied-label="{{ 'botoms.wishlist.copied' | t }}"
+    >
+      <button
+        type="button"
+        class="botoms-card-actions__button button-unstyled"
+        aria-label="{{ 'botoms.wishlist.share' | t: title: product_title }}"
+      >
+        {% render 'botoms-icon', name: 'share', size: 16 %}
+      </button>
+      <span class="botoms-card-actions__toast" aria-hidden="true">{{ 'botoms.wishlist.copied' | t }}</span>
+    </botoms-share-button>
+  {%- endif -%}
+</div>
+
+{% stylesheet %}
+  .botoms-card-actions {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .botoms-card-actions botoms-share-button {
+    position: relative;
+    display: block;
+  }
+
+  .botoms-card-actions__button {
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgb(255 255 255 / 0.9);
+    color: var(--botoms-ink);
+    box-shadow: 0 1px 4px rgb(var(--botoms-ink-rgb) / 0.12);
+    cursor: pointer;
+    transition: transform 0.15s ease, color 0.15s ease;
+  }
+
+  .botoms-card-actions__button:hover {
+    background: var(--botoms-white);
+  }
+
+  .botoms-card-actions__button:active {
+    transform: scale(0.92);
+  }
+
+  .botoms-card-actions__button:focus-visible {
+    outline: 2px solid var(--botoms-ink);
+    outline-offset: 2px;
+  }
+
+  .botoms-card-actions__button--heart[aria-pressed='true'] {
+    color: var(--botoms-rose);
+  }
+
+  .botoms-card-actions__button--heart[aria-pressed='true'] .botoms-icon {
+    fill: currentColor;
+  }
+
+  .botoms-card-actions__toast {
+    position: absolute;
+    top: 50%;
+    right: calc(100% + 6px);
+    padding: 4px 10px;
+    transform: translateY(-50%);
+    border-radius: 999px;
+    background: var(--botoms-ink);
+    color: var(--botoms-white);
+    font-size: 12px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s ease;
+  }
+
+  botoms-share-button[data-copied] .botoms-card-actions__toast {
+    opacity: 1;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .botoms-card-actions__button,
+    .botoms-card-actions__toast {
+      transition: none;
+    }
+  }
+{% endstylesheet %}

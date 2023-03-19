@@ -1,0 +1,15 @@
+{
+  "sections": {
+    "main": {
+      "type": "botoms-wishlist",
+      "settings": {
+        "heading": "Wishlist",
+        "padding-block-start": 24,
+        "padding-block-end": 48
+      }
+    }
+  },
+  "order": [
+    "main"
+  ]
+}

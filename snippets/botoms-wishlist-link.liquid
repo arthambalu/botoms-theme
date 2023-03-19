@@ -1,0 +1,211 @@
+{%- doc -%}
+  Header wishlist heart with a count of saved styles. Also holds the Botoms wishlist script:
+  the list lives in this browser only (localStorage, product handles), with no accounts and no public counts.
+  Used by `botoms-wishlist-button`, `botoms-share-button` and the wishlist page section.
+
+  @example
+  {% render 'botoms-wishlist-link' %}
+{%- enddoc -%}
+
+{%- liquid
+  assign wishlist_page = pages['wishlist']
+  if wishlist_page != blank
+    assign wishlist_url = wishlist_page.url
+  else
+    assign wishlist_url = routes.root_url | append: '/pages/wishlist' | replace: '//', '/'
+  endif
+-%}
+
+<a
+  href="{{ wishlist_url }}"
+  class="header-actions__action botoms-wishlist-link"
+  aria-label="{{ 'botoms.wishlist.open' | t }}"
+>
+  {% render 'botoms-icon', name: 'heart', size: 22 %}
+  <botoms-wishlist-count class="botoms-wishlist-link__count" hidden></botoms-wishlist-count>
+</a>
+
+{% stylesheet %}
+  .botoms-wishlist-link {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-inline-end: 6px;
+    color: var(--color-foreground);
+  }
+
+  .botoms-wishlist-link__count {
+    position: absolute;
+    top: 50%;
+    right: -9px;
+    display: grid;
+    place-items: center;
+    min-width: 16px;
+    height: 16px;
+    padding: 0 4px;
+    transform: translateY(-17px);
+    border-radius: 999px;
+    background: var(--botoms-pink-cherub);
+    color: var(--botoms-ink);
+    font-size: 10px;
+    font-weight: 600;
+    line-height: 1;
+  }
+
+  .botoms-wishlist-link__count[hidden] {
+    display: none;
+  }
+{% endstylesheet %}
+
+{% javascript %}
+  (() => {
+    if (customElements.get('botoms-wishlist-count')) return;
+
+    const KEY = 'botoms:wishlist';
+    const CHANGE = 'botoms:wishlist-change';
+    let memory = [];
+
+    // Product handles, newest first. Falls back to memory when storage is blocked (private mode).
+    const read = () => {
+      try {
+        const stored = JSON.parse(localStorage.getItem(KEY) || '[]');
+        memory = Array.isArray(stored) ? stored.filter((handle) => typeof handle === 'string') : [];
+      } catch (error) {
+        // Keep the in-memory list.
+      }
+      return [...memory];
+    };
+
+    const write = (handles) => {
+      memory = handles;
+      try {
+        localStorage.setItem(KEY, JSON.stringify(handles));
+      } catch (error) {
+        // Not persisted; still works for this page view.
+      }
+      document.dispatchEvent(new CustomEvent(CHANGE, { detail: { handles: [...handles] } }));
+    };
+
+    const wishlist = {
+      CHANGE,
+      handles: read,
+      has: (handle) => read().includes(handle),
+      toggle(handle) {
+        const handles = read();
+        const index = handles.indexOf(handle);
+        if (index === -1) handles.unshift(handle);
+        else handles.splice(index, 1);
+        write(handles);
+        return index === -1;
+      },
+      remove(handle) {
+        write(read().filter((saved) => saved !== handle));
+      },
+    };
+    window.BotomsWishlist = wishlist;
+
+    // Keep other tabs in step.
+    window.addEventListener('storage', (event) => {
+      if (event.key === KEY) document.dispatchEvent(new CustomEvent(CHANGE, { detail: { handles: read() } }));
+    });
+
+    let liveRegion;
+    const announce = (message) => {
+      if (!message) return;
+      if (!liveRegion) {
+        liveRegion = document.createElement('div');
+        liveRegion.className = 'visually-hidden';
+        liveRegion.setAttribute('role', 'status');
+        document.body.append(liveRegion);
+      }
+      liveRegion.textContent = '';
+      requestAnimationFrame(() => (liveRegion.textContent = message));
+    };
+
+    class BotomsWishlistCount extends HTMLElement {
+      connectedCallback() {
+        document.addEventListener(CHANGE, this.update);
+        this.update();
+      }
+
+      disconnectedCallback() {
+        document.removeEventListener(CHANGE, this.update);
+      }
+
+      update = () => {
+        const count = wishlist.handles().length;
+        this.textContent = count > 99 ? '99+' : String(count);
+        this.hidden = count === 0;
+      };
+    }
+
+    // Wraps a <button>; data-handle, data-label-add, data-label-remove, data-added, data-removed.
+    class BotomsWishlistButton extends HTMLElement {
+      connectedCallback() {
+        this.button = this.querySelector('button');
+        if (!this.button) return;
+        this.button.addEventListener('click', this.toggle);
+        document.addEventListener(CHANGE, this.sync);
+        this.sync();
+      }
+
+      disconnectedCallback() {
+        this.button?.removeEventListener('click', this.toggle);
+        document.removeEventListener(CHANGE, this.sync);
+      }
+
+      toggle = (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        const added = wishlist.toggle(this.dataset.handle);
+        announce(added ? this.dataset.added : this.dataset.removed);
+      };
+
+      sync = () => {
+        const saved = wishlist.has(this.dataset.handle);
+        this.button.setAttribute('aria-pressed', String(saved));
+        this.button.setAttribute('aria-label', saved ? this.dataset.labelRemove : this.dataset.labelAdd);
+      };
+    }
+
+    // Wraps a <button>; data-url, data-title, data-copied-label. Native share sheet, else copies the link.
+    class BotomsShareButton extends HTMLElement {
+      connectedCallback() {
+        this.button = this.querySelector('button');
+        this.button?.addEventListener('click', this.share);
+      }
+
+      disconnectedCallback() {
+        this.button?.removeEventListener('click', this.share);
+      }
+
+      share = async (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        const url = new URL(this.dataset.url, window.location.origin).href;
+        if (navigator.share) {
+          try {
+            await navigator.share({ title: this.dataset.title, url });
+          } catch (error) {
+            // Closed the share sheet.
+          }
+          return;
+        }
+        try {
+          await navigator.clipboard.writeText(url);
+          this.setAttribute('data-copied', '');
+          announce(this.dataset.copiedLabel);
+          clearTimeout(this.timer);
+          this.timer = setTimeout(() => this.removeAttribute('data-copied'), 1800);
+        } catch (error) {
+          window.prompt(this.dataset.title, url);
+        }
+      };
+    }
+
+    customElements.define('botoms-wishlist-count', BotomsWishlistCount);
+    customElements.define('botoms-wishlist-button', BotomsWishlistButton);
+    customElements.define('botoms-share-button', BotomsShareButton);
+  })();
+{% endjavascript %}
