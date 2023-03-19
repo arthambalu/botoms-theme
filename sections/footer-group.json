@@ -195,7 +195,8 @@
           "settings": {
             "show_powered_by": false,
             "font_size": "0.75rem",
-            "case": "none"
+            "case": "none",
+            "text_color": "#E6E1DA"
           }
         },
         "policy_list": {
